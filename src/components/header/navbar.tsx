@@ -16,12 +16,10 @@ import { NavItem } from "@/types/nav";
 export default function Navbar({
   dir,
   scrollTextColor,
-  //nav,
   navs,
 }: {
   dir: "rtl" | "ltr";
   scrollTextColor: string;
-  ///nav: string;
   navs: NavItem[];
 }) {
   const locale = useLocale();
@@ -42,7 +40,7 @@ export default function Navbar({
               {subs.length > 0 ? (
                 <>
                   <NavigationMenuTrigger className={scrollTextColor}>
-                    {/* ✅ أضف locale */}
+                  
                     <Link href={`/${titleSlug}/${navItem.stableId}`}>
                       {title}
                     </Link>
@@ -54,12 +52,12 @@ export default function Navbar({
                         return (
                           <li key={i}>
                             <NavigationMenuLink asChild>
-                              {/* ✅ أضف locale */}
+                            
                               <Link
                                 href={`/${subSlug}/${item.stableId}`}
                                 className="w-full px-3 py-2 hover:bg-gray-50"
                               >
-                                {item.title} {/* ✅ النص الأصلي من JSON */}
+                                {item.title}
                               </Link>
                             </NavigationMenuLink>
                           </li>
@@ -70,7 +68,7 @@ export default function Navbar({
                 </>
               ) : (
                 <NavigationMenuLink asChild>
-                  {/* ✅ أضف locale */}
+                  
                   <Link href={`/${titleSlug}/${navItem.stableId}`}>
                     <span className={scrollTextColor}>{title}</span>
                   </Link>

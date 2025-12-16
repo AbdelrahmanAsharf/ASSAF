@@ -2,11 +2,11 @@
 import Link from "next/link";
 import { Phone, Mail, MessageCircle, Facebook, Twitter, Instagram, Youtube } from "lucide-react";
 import Image from "next/image";
-import { useLocale, useTranslations } from "next-intl"; // أهم سطرين
+import { useLocale, useTranslations } from "next-intl"; 
 
 export default function Footer() {
-  const t = useTranslations("Footer"); // يجيب كل الكلام من الـ JSON
-  const locale = useLocale(); // عربي ولا إنجليزي
+  const t = useTranslations("Footer");
+  const locale = useLocale(); 
   const isArabic = locale === "ar";
 
   const images = [

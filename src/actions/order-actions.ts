@@ -1,4 +1,4 @@
-// src/actions/order-actions.ts
+
 "use server";
 
 import { db } from "@/lib/prisma";
@@ -27,7 +27,7 @@ async function getPrismaUser() {
   });
 }
 
-// حفظ الطلب
+
 
 export async function createOrder(
   products: { productId: string; quantity: number }[],
@@ -35,14 +35,14 @@ export async function createOrder(
 ) {
   const user = await getPrismaUser();
 
-  // 1. جيب المنتجات وتأكد إن الكمية متوفرة
+  
   const productIds = products.map((p) => p.productId);
   const dbProducts = await db.product.findMany({
     where: { id: { in: productIds } },
     select: { id: true, stock: true, titleAr: true, titleEn: true },
   });
 
-  // 2. تحقق من المخزون قبل أي حاجة
+  
   for (const item of products) {
     const product = dbProducts.find((p) => p.id === item.productId);
     if (!product) throw new Error(`المنتج غير موجود: ${item.productId}`);
@@ -59,9 +59,9 @@ export async function createOrder(
     }
   }
 
-  // 3. ابدأ Transaction عشان كل حاجة تتم أو مفيش حاجة تتم (أمان 100%)
+  
   const order = await db.$transaction(async (tx) => {
-    // أنشئ الطلب
+  
     const newOrder = await tx.order.create({
       data: {
         userId: user.id,
@@ -109,7 +109,6 @@ export async function createOrder(
   return order;
 }
 
-// جلب طلبات المستخدم
 export async function getUserOrders() {
   const user = await getPrismaUser();
 
@@ -134,32 +133,4 @@ export async function getUserOrders() {
   });
 }
 
-// جلب طلب واحد
-export async function getOrderById(orderId: string) {
-  const user = await getPrismaUser();
 
-  const order = await db.order.findUnique({
-    where: { id: orderId },
-    include: {
-      products: {
-        include: {
-          product: {
-            select: {
-              id: true,
-              titleAr: true,
-              titleEn: true,
-              price: true,
-              imageUrl: true,
-            },
-          },
-        },
-      },
-    },
-  });
-
-  if (!order || order.userId !== user.id) {
-    throw new Error("الطلب غير موجود أو لا تملكه");
-  }
-
-  return order;
-}

@@ -6,7 +6,7 @@ const path = require("path");
 
 const db = new PrismaClient();
 
-// stableId function من slugify.ts
+
 function stableId(str, prefix) {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
@@ -18,7 +18,7 @@ function stableId(str, prefix) {
 
 async function main() {
   try {
-    // قراءة JSON files
+
     const arPath = path.join(process.cwd(), "src/locale/ar.json");
     const enPath = path.join(process.cwd(), "src/locale/en.json");
 

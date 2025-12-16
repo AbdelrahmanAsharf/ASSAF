@@ -34,7 +34,7 @@ export default async function AddProductPage({
   });
 
   const subs = await db.subCategory.findMany({
-    select: { id: true, nameAr: true, categoryId: true }, // ✅ هنا جبت categoryId
+    select: { id: true, nameAr: true, categoryId: true }, 
   });
 
   return <AddProductForm categories={categories} subs={subs} />;

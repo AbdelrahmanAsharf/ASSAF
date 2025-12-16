@@ -1,22 +1,10 @@
 'use client';
 
-import { GlobeIcon, MenuIcon, ChevronLeft, BellRing, Star, ShoppingCart, LogOut, CircleUser, BriefcaseBusiness } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
+import {  MenuIcon, ChevronLeft, BellRing, Star, ShoppingCart, LogOut, CircleUser, BriefcaseBusiness } from "lucide-react";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import {
-  RadioGroup,
-  RadioGroupItem,
-} from "@/components/ui/radio-group";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+
+
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
@@ -61,7 +49,7 @@ export default function Header({
         setHeader("pt-15")
         setShop("/icon/download (1).svg")
         if (scrollY > 300) {
-          // بعد التمرير أكثر: الـ header الثابت يظهر
+          
           setShowFixedHeader(true);
           setBgClass('bg-white/30 backdrop-blur-sm');
           setTextColorClass('text-black/80');
@@ -77,7 +65,7 @@ export default function Header({
         setShop("/icon/download.svg")
         setShopcolor("bg-red-400 text-white")
 
-        // الصفحات غير الرئيسية
+        
         if (scrollY > 200) {
           setShowFixedHeader(true);
           setBgClass('bg-white shadow-sm');
@@ -115,7 +103,7 @@ export default function Header({
             <div className="cursor-pointer flex gap-3 ">
               <SheetDemo dir={dir} navs={navsData} />
               <SearchDialog />
-              <DialogDemo
+              <LanguageSwitcher
                 dir={dir}
                 setSelectedLang={setSelectedLang}
                 selectedLang={selectedLang}
@@ -175,11 +163,6 @@ export default function Header({
           <div className="cursor-pointer flex gap-3">
             <SheetDemo dir={dir} navs={navsData} />
             <SearchDialog />
-            <DialogDemo
-              dir={dir}
-              setSelectedLang={setSelectedLang}
-              selectedLang={selectedLang}
-            />
           </div>
           <div>
             <Link
@@ -222,81 +205,6 @@ export default function Header({
   );
 }
 
-const flags = {
-  en: "https://flagcdn.com/w20/gb.png",
-  ar: "https://flagcdn.com/w20/sa.png",
-};
-
-interface DialogDemoProps {
-  dir: 'rtl' | 'ltr';
-  setSelectedLang: (lang: 'en' | 'ar') => void;
-  selectedLang: 'en' | 'ar';
-}
-
-function DialogDemo({ dir, setSelectedLang, selectedLang }: DialogDemoProps) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
-  const t = useTranslations("language"); // ✅ هنا الترجمة
-
-
-  const handleClick = () => {
-    const parts = pathname.split("/");
-    parts[1] = selectedLang;
-    const newPath = parts.join("/");
-    console.log("🔄 التحويل إلى:", newPath);
-    router.push(newPath);
-    setIsOpen(false);
-  };
-  return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <button
-          className="cursor-pointer"
-          type="button"
-        >
-          <GlobeIcon className="w-5 h-5" />
-        </button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[380px]"  >
-        <DialogHeader
-          className={cn(
-            "flex flex-col gap-2",
-            dir === "rtl" ? "text-right" : "text-left"
-          )}
-        >
-          <DialogTitle className="font-normal">{t("title")}</DialogTitle>
-        </DialogHeader>
-
-
-        <RadioGroup
-          value={selectedLang}
-          onValueChange={(value) => setSelectedLang(value as 'en' | 'ar')}
-          style={{ direction: dir }}
-        >
-          <div className="flex items-center gap-3 py-3">
-            <RadioGroupItem value="en" id="r1" />
-            <Label htmlFor="r1" className="flex items-center justify-between w-full gap-2 text-gray-600 font-sans text-base font-normal cursor-pointer">
-              English
-              <Image src={flags.en} alt="English Flag" className="rounded-sm" width={20} height={20} />
-            </Label>
-          </div>
-          <div className="flex items-center gap-3 py-3">
-            <RadioGroupItem value="ar" id="r2" />
-            <Label htmlFor="r2" className="flex items-center  justify-between w-full gap-2 text-gray-600 font-sans text-base font-normal cursor-pointer">
-              العربية
-              <Image src={flags.ar} alt="Saudi Arabia Flag" className="rounded-sm" width={20} height={20} />
-            </Label>
-          </div>
-        </RadioGroup>
-        <DialogFooter>
-          <Button onClick={handleClick} className="w-full py-6 cursor-pointer bg-black hover:bg-black">{t("confirm")}</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
 
 
 
@@ -324,7 +232,7 @@ export function SheetDemo({ dir, navs }: { dir: "rtl" | "ltr"; navs: NavItem[] }
           <SheetTitle
             className="cursor-pointer"
             onClick={() => {
-              if (active) setActive(null); // رجوع للقائمة الرئيسية لو كان فيه active
+              if (active) setActive(null);
             }}
           >
             {active ? (locale === "ar" ? active.titleAr : active.titleEn) : "profile"}
@@ -423,6 +331,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { NavItem } from "@/types/nav";
 import { SearchDialog } from "./search";
+import { LanguageSwitcher } from "./LanguageSwitche";
 
 interface DropdownMenuDemoProps {
   user: {

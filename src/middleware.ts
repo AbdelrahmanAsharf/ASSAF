@@ -24,24 +24,24 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
   const url = req.nextUrl;
   const pathname = url.pathname;
 
-  // 1) API → تجاهل تماماً
+  
   if (pathname.startsWith("/api")) return NextResponse.next();
 
-  // 2) تأكد إن فيه لغة
+  
   const hasLocale = pathname.startsWith("/ar") || pathname.startsWith("/en");
   if (!hasLocale) return NextResponse.redirect(new URL(`/ar${pathname}`, req.url));
 
-  // 3) استخرج اللغة والمسار بعد اللغة
+  
   const locale = pathname.startsWith("/ar") ? "ar" : "en";
   const pathWithoutLocale = pathname.replace(/^\/(ar|en)/, "") || "/";
 
-  // 4) حماية المسارات
+  
   const firstSegment = pathWithoutLocale.split("/")[1] || "";
   if (protectedPaths.has(firstSegment) && !userId) {
     return NextResponse.redirect(new URL(`/${locale}`, req.url));
   }
 
-  // 5) Next-Intl
+  
   return intlMiddleware(req);
 });
 

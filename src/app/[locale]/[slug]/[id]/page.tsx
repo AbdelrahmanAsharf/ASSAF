@@ -1,4 +1,4 @@
-//src\app\[locale]\[slug]\[id]\page.tsx
+
 import { notFound } from "next/navigation";
 import { db } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
@@ -82,7 +82,7 @@ export default async function Page({ params }: PageProps) {
         );
     }
 
-    // === صفحة الكاتيجوري (c) ===
+    
     if (type === "c") {
         const category = await db.category.findUnique({
             where: { stableId: realStableId },
@@ -188,7 +188,7 @@ export default async function Page({ params }: PageProps) {
         );
     }
 
-    // === صفحة الـ SubCategory (s) ===
+    
     if (type === "s") {
         const subCategory = await db.subCategory.findUnique({
             where: { stableId: realStableId },
@@ -243,7 +243,7 @@ export default async function Page({ params }: PageProps) {
         );
     }
 
-    // === صفحة المنتج (p) ===
+
     if (type === "p") {
         const product = await db.product.findUnique({
             where: { stableId: realStableId },
@@ -276,14 +276,14 @@ export default async function Page({ params }: PageProps) {
 
         return (
             <div className="pt-20 lg:pt-35 mt-10">
-                {/* Container بدون padding داخلي */}
+                
                 <div className="container ">
-                    {/* Breadcrumbs مع padding صغير */}
+                    
                     <Breadcrumbs crumbs={crumbs} />
 
 
                     <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        {/* === العمود الأول: الصورة الرئيسية (ثابتة في الكبير) === */}
+                        
                         <div className="lg:sticky lg:top-24 z-10 h-fit">
                             <div className="relative w-full h-96 lg:h-[700px] overflow-hidden rounded-lg bg-gray-50" >
                                 <Image
@@ -297,7 +297,7 @@ export default async function Page({ params }: PageProps) {
                             </div>
                         </div>
 
-                        {/* === العمود الثاني: الصور الإضافية + التفاصيل === */}
+                        
                         <div className="space-y-6">
                             <div>
                                 <h1 className="text-2xl font-bold mb-2">{title}</h1>
@@ -335,7 +335,7 @@ export default async function Page({ params }: PageProps) {
                                     )}
                                 </p>
                             </div>
-                            {/* الصور الإضافية - تحت بعض */}
+                        
                             <div className="flex flex-col gap-5">
                                 {product.media
                                     .filter((m) => m.language === (locale === "ar" ? "AR" : "EN"))
@@ -358,7 +358,7 @@ export default async function Page({ params }: PageProps) {
                                         </div>
                                     ))}
                             </div>
-                            {/* === التفاصيل (تحت الصور الإضافية) === */}
+                            
                             <div className="space-y-6">
 
 

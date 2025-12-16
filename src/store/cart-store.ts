@@ -1,8 +1,8 @@
-// store/cart-store.ts
+
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-// ============ CART ITEM (مشترك) ============
+
 export type CartItem = {
   id: string;
   title: string;
@@ -14,13 +14,12 @@ export type CartItem = {
   stock: number;
 };
 
-// ============ CART STORE ============
 type CartState = {
   items: CartItem[];
   addItem: (item: CartItem) => void;
   removeItem: (id: string) => void;
   clearCart: () => void;
-  changeQty: (id: string, action: "inc" | "dec") => void; // 
+  changeQty: (id: string, action: "inc" | "dec") => void; 
 };
 
 export const useCart = create<CartState>()(
@@ -66,7 +65,7 @@ export const useCart = create<CartState>()(
   )
 );
 
-// ============ WISHLIST STORE ============
+
 type WishlistState = {
   items: CartItem[];
   addItem: (item: CartItem) => void;

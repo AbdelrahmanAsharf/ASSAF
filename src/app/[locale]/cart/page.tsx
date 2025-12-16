@@ -29,15 +29,15 @@ export default function Cart() {
   const [loading, setLoading] = useState(false);
   const totalAmount = items.reduce((sum, i) => sum + i.price * i.qty, 0);
 
-  // Reference to control login dialog
+
   const userDialogRef = useRef<UserSRef>(null);
 
   const handleCheckout = async () => {
     if (!isLoaded) return;
 
-    // Check if user is not logged in
+    
     if (!user) {
-      // Open the login dialog
+      
       userDialogRef.current?.openDialog();
       return;
     }
@@ -215,7 +215,7 @@ export default function Cart() {
         )}
       </div>
 
-      {/* Hidden UserS component for authentication */}
+      
       <div className="hidden">
         <UserS ref={userDialogRef} />
       </div>

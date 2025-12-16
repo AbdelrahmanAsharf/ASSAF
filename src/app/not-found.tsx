@@ -1,4 +1,4 @@
-// src/app/not-found.tsx   ← بره [locale] وهيشتغل 100000000%
+
 
 import Image from "next/image";
 import Link from "next/link";
@@ -9,7 +9,7 @@ import { Cairo } from "next/font/google";
 const cairo = Cairo({ subsets: ["arabic", "latin"], weight: ["400", "700", "900"] });
 
 export default async function NotFound() {
-  const locale = (await headers()).get("x-locale") || "ar";   // ← ده كل اللي محتاجينه
+  const locale = (await headers()).get("x-locale") || "ar";  
 
   const t = {
     ar: {

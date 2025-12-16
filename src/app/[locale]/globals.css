@@ -149,12 +149,11 @@
 
   ::-webkit-scrollbar-track {
     background: transparent;
-    /* المسار شفاف/عادي */
   }
 
   ::-webkit-scrollbar-thumb {
     background: #000000;
-    /* الجزء اللي بتسحبه أسود */
+    
   }
 
   #scroll-to-top {
@@ -178,7 +177,7 @@
     align-items: center;
     justify-content: center;
   }
-  /* Switch RTL Support */
+  
 [dir="rtl"] [data-slot="switch-thumb"][data-state="checked"] {
     transform: translateX(calc(-100% + 1px)) !important;
 }
@@ -186,7 +185,7 @@
 [dir="rtl"] [data-slot="switch-thumb"][data-state="unchecked"] {
     transform: translateX(-13) !important;
 }
-  /* RTL Phone Input Styles */
+  
 .phone-input-rtl .react-tel-input {
     direction: rtl;
 }
@@ -208,18 +207,18 @@
     border-radius: 0 6px 6px 0 !important;
 }
 
-/* إصلاح السهم في RTL */
+
 .phone-input-rtl .react-tel-input .selected-flag .arrow {
     left: 11px !important;
     right: 20px !important;
-    transform: scaleX(-1); /* عكس اتجاه السهم */
+    transform: scaleX(-1); 
 }
 
 .phone-input-rtl .react-tel-input .selected-flag .arrow.up {
     transform: scaleX(-1) rotate(180deg);
 }
 
-/* Dropdown list RTL */
+
 .phone-input-rtl .react-tel-input .country-list {
     text-align: right;
     direction: rtl;

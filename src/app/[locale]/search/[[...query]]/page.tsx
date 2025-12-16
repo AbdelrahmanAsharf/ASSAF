@@ -14,12 +14,12 @@ interface Props {
 export default async function SearchPage({ params }: Props) {
   const { locale, query: rawQuery } = await params;
 
-  // إذا مفيش query أو فارغ → 404
+
   if (!rawQuery || rawQuery.length === 0) {
     notFound();
   }
 
-  // جمع الـ segments وفك التشفير
+
   const query = decodeURIComponent(rawQuery.join("/")).trim();
 
   if (!query) {

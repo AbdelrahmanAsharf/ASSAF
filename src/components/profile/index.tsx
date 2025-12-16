@@ -10,7 +10,7 @@ import { useTranslations } from 'next-intl';
 export default function Profileindex() {
     const { user } = useUser();
     const { signOut } = useClerk();
-    const t = useTranslations("menu"); // 👈 استخدم namespace مثل menu.json
+    const t = useTranslations("menu"); 
 
 
 

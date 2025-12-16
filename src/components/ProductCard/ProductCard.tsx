@@ -29,7 +29,7 @@ interface ProductCardProps {
   modelnumber: string | number | null;
   stock: number;
   onSubscribe?: () => void;
-  category?: string;   // 👈 جديد
+  category?: string;   
   sub?: string;
 }
 
@@ -59,13 +59,13 @@ export default function ProductCard({
   const handleWishlistToggle = () => {
     if (!isSignedIn) {
       toast.error(("loginRequired"));
-      return; // 👈 مهم جداً!
+      return; 
     }
     if (inWishlist) {
-      // لو موجود → احذفه
+      
       removeFromWishlist(id);
     } else {
-      // لو مش موجود → أضفه
+    
       addToWishlist({
         id,
         title,
@@ -183,7 +183,7 @@ interface DialogDemoProps {
   oldprice: number;
   modelnumber: string | number | null;
   stock: number;
-  addItem: (item: CartItem) => void; // 🟢 كده متطابق
+  addItem: (item: CartItem) => void; 
 
 }
 
@@ -213,7 +213,7 @@ export function DialogDemo({ id, image, title, price, oldprice, modelnumber, sto
       open={isOpen}
       onOpenChange={(open) => {
         setIsOpen(open);
-        // ترجع 1 بس لما تقفل الـ Dialog
+        
         if (!open) {
           setDialogQty(1);
         }

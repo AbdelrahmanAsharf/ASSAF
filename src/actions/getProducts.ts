@@ -3,17 +3,16 @@ import { db } from "@/lib/prisma";
 
 export async function getProductsByCategoryOrSlug(
   slug: string,
-  locale?: string  // ✅ أضفنا locale parameter
+  locale?: string  
 ) {
   const decodedSlug = decodeURIComponent(slug);
   const cleanSlug = decodedSlug.replace(/-/g, " ").trim();
   
-  console.log("🔍 getProducts Debug:");
   console.log("Original slug:", slug);
   console.log("Clean slug:", cleanSlug);
-  console.log("Locale:", locale); // ✅ استخدمنا locale
+  console.log("Locale:", locale); 
 
-  // ✅ التحقق من الصفحات الخاصة
+
   if (cleanSlug === "الجديد" || cleanSlug === "new") {
     console.log("✅ Fetching new arrivals...");
     return await db.product.findMany({
@@ -29,7 +28,7 @@ export async function getProductsByCategoryOrSlug(
     });
   }
 
-  // باقي الكود (كاتيجوري، ساب)...
+  
   const searchKey = cleanSlug;
 
   const category = await db.category.findFirst({

@@ -37,7 +37,7 @@ export default function ScrollCircle({ dir }: ScrollCircleProps) {
       onClick={scrollToTop}
       className={`fixed bottom-6 ${positionClass} z-50 cursor-pointer group`}
     >
-      {/* الدائرة الخارجية مع التقدم */}
+    
       <div
         className="relative w-[50px] h-[50px] rounded-full transition-all duration-300"
         style={{
@@ -47,13 +47,13 @@ export default function ScrollCircle({ dir }: ScrollCircleProps) {
           )`,
         }}
       >
-        {/* 👇 الخط الأبيض الفاصل */}
+      
         <div className="absolute inset-[3px] rounded-full bg-white"></div>
         
-        {/* 👇 خلفية شفافة/رمادي فاتح عشان الخط الأبيض يبان */}
+        
         <div className="absolute inset-[5px] rounded-full bg-gray-100"></div>
 
-        {/* السهم في المنتصف */}
+    
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="bg-white group-hover:bg-black rounded-full p-3 transition-all duration-200 shadow-lg group-hover:scale-110">
             <ArrowUp className="w-5 h-5 text-black group-hover:text-white transition-colors duration-200" />

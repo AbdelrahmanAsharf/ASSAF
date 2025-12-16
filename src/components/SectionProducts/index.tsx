@@ -1,20 +1,19 @@
-// src/components/SectionProducts.tsx
-//import { getProductsByCategory } from "@/lib/getProducts";
+
 import { getProductsByCategoryOrSlug } from "@/actions/getProducts";
 import ProductCard from "@/components/ProductCard/ProductCard";
 import { Handbag } from "lucide-react";
 
 interface SectionProductsProps {
-  title: string; // مثال: "الجديد" أو "جميع المنتجات"
-  locale: string; // ar أو en
-  limit?: number; // عدد المنتجات اللي هتظهر
+  title: string;
+  locale: string; 
+  limit?: number; 
 }
 
 export default async function SectionProducts({ title, locale, limit = 4 }: SectionProductsProps) {
-  // استدعاء المنتجات من السيرفر حسب العنوان واللغة
+  
   const products = await getProductsByCategoryOrSlug(title, locale);
   console.log(products)
-  // تحديد عدد المنتجات
+
   const limitedProducts = products.slice(0, limit);
 
   return (

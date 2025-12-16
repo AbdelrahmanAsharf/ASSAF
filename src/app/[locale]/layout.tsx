@@ -3,7 +3,7 @@
 
 import type { Metadata } from "next";
 import "./globals.css";
-import { headers } from "next/headers"; // ← مهم جدًا للـ not-found
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { Cairo, Poppins } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
@@ -49,7 +49,7 @@ export default async function LocaleLayout({
   const fontClass = locale === "ar" ? cairo.variable : poppins.variable;
   const messages = await getMessages();
 
-  // السطر السحري اللي يخلّي not-found.tsx تعرف الـ pathname
+  
   const pathname = (await headers()).get("x-pathname") || `/${locale}`;
   (globalThis as any).__NEXT_LOCALE_PATHNAME = pathname;
 

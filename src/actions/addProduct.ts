@@ -110,7 +110,7 @@ export async function addProduct({
         connect: subCategoryIds.map((id) => ({ id })),
       },
       media: {
-        create: mediaToCreate, // ✅ الصور محفوظة حسب اللغة
+        create: mediaToCreate, 
       },
       stableId: stableId(titleAr, "p"),
     },

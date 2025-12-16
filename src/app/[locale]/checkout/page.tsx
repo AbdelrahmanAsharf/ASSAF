@@ -280,7 +280,7 @@ function CheckoutForm({
             toast.success("toast.paymentSuccess");
 
             try {
-                // 1. أرسل الطلب للـ Server Action
+        
                 const order = await createOrder(
                     cartItems.map(i => ({
                         productId: i.id,
@@ -288,10 +288,10 @@ function CheckoutForm({
                     }))
                 );
 
-                // 2. امسح الكارت
+                
                 clearCart();
 
-                // 3. روح لصفحة النجاح مع رقم الطلب
+                
                 window.location.href = `/${locale}/success?order=${order.id}&amount=${amount}`;
             } catch (err: any) {
                 toast.raw.error(err.message || "فشل حفظ الطلب");

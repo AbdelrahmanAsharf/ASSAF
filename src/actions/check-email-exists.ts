@@ -1,4 +1,4 @@
-// actions/check-email-exists.ts
+
 "use server";
 
 import { createClerkClient } from "@clerk/nextjs/server";

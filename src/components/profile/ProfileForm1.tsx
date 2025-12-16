@@ -37,12 +37,12 @@ import { useTranslations, useLocale } from 'next-intl'
 import { createProfileSchema, type ProfileSchema } from "@/validations/auth";
 import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/utils/toast'
-import { syncUserToPrisma } from '@/actions/sync-user' // ✅ استيراد دالة المزامنة
+import { syncUserToPrisma } from '@/actions/sync-user' 
 
 
 export function ProfileForm1() {
     const { user } = useUser()
-    const t = useTranslations("profile") // 👈 نحمل ترجمة من ملف profile.json
+    const t = useTranslations("profile") 
     const locale = useLocale()
     const tValidations = useTranslations("validations");
     const [open, setOpen] = React.useState(false)
@@ -70,7 +70,7 @@ export function ProfileForm1() {
                     ? new Date(user.unsafeMetadata.birthday)
                     : undefined,
         },
-        mode: "onBlur", // التحقق عند مغادرة الحقل
+        mode: "onBlur", 
     });
 
 
@@ -170,7 +170,7 @@ export function ProfileForm1() {
                                             captionLayout="dropdown"
                                             onSelect={(date) => {
                                                 field.onChange(date)
-                                                setOpen(false) // ✅ يغلق البوبوفر بعد 
+                                                setOpen(false) 
                                                 form.trigger("birthday");
                                             }}
                                         />
@@ -191,7 +191,7 @@ export function ProfileForm1() {
                                 <Select
                                     onValueChange={(value) => {
                                         field.onChange(value);
-                                        form.trigger("sex"); // تحقق عند اختيار الجنس
+                                        form.trigger("sex"); 
                                     }}
                                     value={field.value}
                                 >

@@ -150,7 +150,7 @@ export default function AddProductForm({
         stock: Number(stock),
         media: uploadedMedia.map((m) => ({
           url: m.url,
-          language: m.language,  // ✅ احتفظ بـ BOTH
+          language: m.language,  
         })),
       });
 
