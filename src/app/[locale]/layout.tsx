@@ -26,10 +26,9 @@ export const metadata: Metadata = {
   title: "عساف للعطور | 3saf - إما العظمة أو لا شيء",
   description:
     "عطور عساف الاصلية - عطور سعودية فاخرة بثبات عالي: فيكتوريا، بينك ليدي، عود نجدي. شحن مجاني وتغليف هدايا",
-  openGraph: {
-    title: "عساف للعطور | 3saf Perfumes",
-    description: "إما العظمة أو لا شيء - عطور سعودية فاخرة بثبات يدوم 24 ساعة",
-    images: ["/og-assaf.jpg"],
+  icons: {
+    icon: "/icon/logo.webp",
+    shortcut: "/icon/logo.webp",
   },
 };
 
@@ -49,7 +48,7 @@ export default async function LocaleLayout({
   const fontClass = locale === "ar" ? cairo.variable : poppins.variable;
   const messages = await getMessages();
 
-  
+
   const pathname = (await headers()).get("x-pathname") || `/${locale}`;
   (globalThis as any).__NEXT_LOCALE_PATHNAME = pathname;
 
