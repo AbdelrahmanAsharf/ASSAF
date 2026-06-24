@@ -135,7 +135,7 @@ export default async function Page({ params }: PageProps) {
                 </Carousel>
               ) : (
                 <div className="flex gap-4  my-6">
-                  {category.subCategories.map((sub) => {
+                  {category.subCategories.map((sub: any) => {
                     const subName = locale === "ar" ? sub.nameAr : sub.nameEn;
                     const subSlug = slugify(subName);
                     return (
@@ -226,7 +226,7 @@ export default async function Page({ params }: PageProps) {
 
         {products.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 my-6">
-            {products.map((p) => (
+            {products.map((p: any) => (
               <ProductCard
                 key={p.id}
                 stableId={p.stableId}
