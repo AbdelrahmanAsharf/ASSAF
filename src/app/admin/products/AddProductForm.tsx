@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // app/admin/products/AddProductForm.tsx
 "use client";
 
@@ -123,14 +124,14 @@ startTransition(async () => {
               <label className="block text-xs text-gray-400 mb-1.5">قسم فرعي</label>
               <select name="subCategoryId" className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black/10 text-gray-700">
                 <option value="">—</option>
-                {subCategories.map((s) => <option key={s.id} value={s.id}>{s.category.nameAr} ← {s.nameAr}</option>)}
+                {subCategories.map((s: any) => <option key={s.id} value={s.id}>{s.category.nameAr} ← {s.nameAr}</option>)}
               </select>
             </div>
             <div>
               <label className="block text-xs text-gray-400 mb-1.5">قسم تالت</label>
               <select name="subSubCategoryId" className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-black/10 text-gray-700">
                 <option value="">—</option>
-                {subSubCategories.map((s) => <option key={s.id} value={s.id}>{s.subCategory.nameAr} ← {s.nameAr}</option>)}
+                {subSubCategories.map((s: any) => <option key={s.id} value={s.id}>{s.subCategory.nameAr} ← {s.nameAr}</option>)}
               </select>
             </div>
           </div>

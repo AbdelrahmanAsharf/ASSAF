@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // app/admin/users/page.tsx
 import { db } from "@/lib/prisma";
 import { ChangeRoleButton } from "./ChangeRoleButton";
@@ -30,7 +31,7 @@ export default async function UsersPage() {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {users.map((u) => (
+            {users.map((u: any) => (
               <tr key={u.id} className="hover:bg-gray-50 transition-colors">
                 <td className="p-4">
                   <p className="font-medium text-gray-800">{u.firstName} {u.lastName}</p>

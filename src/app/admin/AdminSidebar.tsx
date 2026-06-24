@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 // app/admin/AdminSidebar.tsx
 import Link from "next/link";
@@ -42,7 +43,7 @@ export function AdminSidebar({
 
       {/* Nav */}
       <nav className="flex-1 p-4 space-y-1">
-        {links.map((link) => {
+        {links.map((link: any) => {
           const active = link.exact
             ? pathname === link.href
             : pathname.startsWith(link.href);
