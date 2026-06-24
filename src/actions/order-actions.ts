@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
+
 import { currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 
@@ -55,7 +55,7 @@ export async function createOrder(
     }
   }
 
-  const order = await db.$transaction(async (tx: Prisma.TransactionClient) => {
+  const order = await db.$transaction(async (tx: Parameters<Parameters<typeof db.$transaction>[0]>[0]) => {
     const newOrder = await tx.order.create({
       data: {
         userId: user.id,
