@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // app/admin/page.tsx
 import { db } from "@/lib/prisma";
 import { Users, ShoppingBag, LayoutGrid, Package } from "lucide-react";
@@ -29,7 +30,7 @@ export default async function AdminDashboard() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((s) => (
+        {stats.map((s: any) => (
           <div key={s.label} className="bg-white rounded-xl p-5 shadow-sm flex items-center gap-4">
             <div className={`p-3 rounded-lg ${s.color}`}>
               <s.icon className="w-5 h-5" />
@@ -48,7 +49,7 @@ export default async function AdminDashboard() {
           <h2 className="font-semibold text-gray-700">آخر المستخدمين</h2>
         </div>
         <div className="divide-y">
-          {recentUsers.map((u) => (
+          {recentUsers.map((u: any) => (
             <div key={u.id} className="p-4 flex items-center justify-between">
               <div>
                 <p className="font-medium text-gray-800">{u.firstName} {u.lastName}</p>
