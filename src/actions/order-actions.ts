@@ -22,35 +22,34 @@ async function getPrismaUser() {
       firstName: clerkUser.firstName ?? "",
       lastName: clerkUser.lastName ?? "",
       imageUrl: clerkUser.imageUrl ?? "",
-      phone: "", // ✅ ضيف ده
+      phone: "",
     },
   });
 }
 
 export async function createOrder(
   products: { productId: string; quantity: number }[],
-  locale: "ar" | "en" = "ar", // ← أضف الـ locale هنا
+  locale: "ar" | "en" = "ar",
 ) {
   const user = await getPrismaUser();
 
   const productIds = products.map((p) => p.productId);
   const dbProducts = await db.product.findMany({
     where: { id: { in: productIds } },
-  select: { id: true, stock: true, nameAr: true, nameEn: true }, // ✅
+    select: { id: true, stock: true, nameAr: true, nameEn: true },
   });
 
+  // ✅ الحل: استخرج الـ type من نتيجة الـ query مباشرة
+  type DbProduct = (typeof dbProducts)[number];
+
   for (const item of products) {
-    const product = dbProducts.find((p) => p.id === item.productId);
+    const product = dbProducts.find((p: DbProduct) => p.id === item.productId);
     if (!product) throw new Error(`المنتج غير موجود: ${item.productId}`);
     if (product.stock < item.quantity) {
       throw new Error(
         locale === "ar"
-          ? `الكمية المطلوبة غير متوفرة لـ "${
-              product.nameAr || product.nameEn
-            }" (متوفر: ${product.stock})`
-          : `Not enough stock for "${
-              product.nameEn || product.nameAr
-            }" (available: ${product.stock})`,
+          ? `الكمية المطلوبة غير متوفرة لـ "${product.nameAr || product.nameEn}" (متوفر: ${product.stock})`
+          : `Not enough stock for "${product.nameEn || product.nameAr}" (available: ${product.stock})`,
       );
     }
   }
@@ -83,15 +82,10 @@ export async function createOrder(
       },
     });
 
-    // 4. اقلل المخزون لكل منتج
     for (const item of products) {
       await tx.product.update({
         where: { id: item.productId },
-        data: {
-          stock: {
-            decrement: item.quantity,
-          },
-        },
+        data: { stock: { decrement: item.quantity } },
       });
     }
 
