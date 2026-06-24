@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { notFound } from "next/navigation";
 import { db } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
@@ -65,7 +66,7 @@ export default async function Page({ params }: PageProps) {
         <div className="container">
           <h2 className="font-extrabold text-2xl mb-6">{pageTitle}</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 my-6">
-            {specialProducts.map((p) => (
+            {specialProducts.map((p: any) => (
               <ProductCard
                 key={p.id}
                 stableId={p.stableId}
