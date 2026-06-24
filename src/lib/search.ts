@@ -1,18 +1,15 @@
 // src/lib/search.ts
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { db } from "@/lib/prisma"; // ✅ استخدم الـ db الموجود
 
 export type SearchResults = {
   products: {
     id: string;
     stableId: string;
     imageUrl: string;
-    titleAr: string;
-    titleEn: string;
+    nameAr: string;
+    nameEn: string;
     price: number;
     oldPrice: number;
-    modelNumber: string | null;
     stock: number;
   }[];
   categories: {
@@ -33,53 +30,26 @@ export type SearchResults = {
 
 export async function searchEverything(
   query: string,
-  locale: "ar" | "en" = "ar",
   limit = 20
 ): Promise<SearchResults> {
   const sanitized = query.trim();
   if (!sanitized) {
-    return {
-      products: [],
-      categories: [],
-      subCategories: [],
-      total: 0,
-      query: "",
-    };
+    return { products: [], categories: [], subCategories: [], total: 0, query: "" };
   }
 
-    console.log("Search locale:", locale);
-
-
-  // البحث في كل الحقول
   const [products, categories, subCategories] = await Promise.all([
-    // 1. المنتجات
-    prisma.product.findMany({
+    db.product.findMany({
       where: {
         OR: [
-          { titleAr: { contains: sanitized, mode: "insensitive" } },
-          { titleEn: { contains: sanitized, mode: "insensitive" } },
-          { descriptionAr: { contains: sanitized, mode: "insensitive" } },
-          { descriptionEn: { contains: sanitized, mode: "insensitive" } },
-          { modelNumber: { contains: sanitized, mode: "insensitive" } },
+          { nameAr: { contains: sanitized, mode: "insensitive" } },
+          { nameEn: { contains: sanitized, mode: "insensitive" } },
         ],
       },
-      select: {
-        id: true,
-        stableId: true,
-        imageUrl: true,
-        titleAr: true,
-        titleEn: true,
-        price: true,
-        oldPrice: true,
-        modelNumber: true,
-        stock: true,
-      },
+      select: { id: true, stableId: true, imageUrl: true, nameAr: true, nameEn: true, price: true, oldPrice: true, stock: true },
       take: limit,
       orderBy: { price: "asc" },
     }),
-
-    // 2. التصنيفات
-    prisma.category.findMany({
+    db.category.findMany({
       where: {
         OR: [
           { nameAr: { contains: sanitized, mode: "insensitive" } },
@@ -89,9 +59,7 @@ export async function searchEverything(
       select: { id: true, stableId: true, nameAr: true, nameEn: true },
       take: 10,
     }),
-
-    // 3. التصنيفات الفرعية
-    prisma.subCategory.findMany({
+    db.subCategory.findMany({
       where: {
         OR: [
           { nameAr: { contains: sanitized, mode: "insensitive" } },

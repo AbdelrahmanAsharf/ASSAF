@@ -11,7 +11,7 @@ interface SectionProductsProps {
 
 export default async function SectionProducts({ title, locale, limit = 4 }: SectionProductsProps) {
   
-  const products = await getProductsByCategoryOrSlug(title, locale);
+  const products = await getProductsByCategoryOrSlug(title);
   console.log(products)
 
   const limitedProducts = products.slice(0, limit);
@@ -26,11 +26,10 @@ export default async function SectionProducts({ title, locale, limit = 4 }: Sect
               id={p.id}
               stableId={p.stableId}
               image={p.imageUrl}
-              titleAr={p.titleAr}
-              titleEn={p.titleEn}
+              nameAr={p.nameAr}
+              nameEn={p.nameEn}
               price={p.price}
               oldprice={p.oldPrice}
-              modelnumber={p.modelNumber}
               stock={p.stock}
             />
           ))

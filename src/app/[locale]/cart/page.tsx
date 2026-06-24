@@ -1,3 +1,4 @@
+// src/app/[locale]/cart/page.tsx
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
@@ -24,20 +25,15 @@ export default function Cart() {
   const crumbs = [{ title: t("title") }];
 
   const { user, isLoaded } = useUser();
-
   const { items, changeQty, removeItem } = useCart();
   const [loading, setLoading] = useState(false);
   const totalAmount = items.reduce((sum, i) => sum + i.price * i.qty, 0);
-
-
   const userDialogRef = useRef<UserSRef>(null);
 
   const handleCheckout = async () => {
     if (!isLoaded) return;
 
-    
     if (!user) {
-      
       userDialogRef.current?.openDialog();
       return;
     }
@@ -45,27 +41,44 @@ export default function Cart() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/create-payment-intent", {
+      // 1️⃣ Call our backend to generate the Kashier hash
+      const res = await fetch("/api/kashier/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: totalAmount * 100,
-          username: user.firstName || "مستخدم",
+          amount: totalAmount,
+          currency: "EGP",  // ← غيّر للعملة اللي تناسبك (SAR, EGP, USD...)
+          cartItems: items.map((i) => ({
+            id: i.id,
+            title: i.title,
+            qty: i.qty,
+            price: i.price,
+          })),
         }),
       });
 
-      const { clientSecret } = await res.json();
+      if (!res.ok) throw new Error("Failed to create order");
 
-      const cartData = JSON.stringify(items.map(i => ({
-        id: i.id,
-        title: i.title,
-        image: i.image,
-        price: i.price,
-        qty: i.qty,
-        total: i.price * i.qty
-      })));
+      const { orderId, amount, currency, hash, merchantId, apiKey } = await res.json();
 
-      router.push(`/checkout?secret=${clientSecret}&amount=${totalAmount}&cart=${encodeURIComponent(cartData)}`);
+      // 2️⃣ Prepare cart data to pass to checkout page
+      const cartData = encodeURIComponent(
+        JSON.stringify(
+          items.map((i) => ({
+            id: i.id,
+            title: i.title,
+            image: i.image,
+            price: i.price,
+            qty: i.qty,
+            total: i.price * i.qty,
+          }))
+        )
+      );
+
+      // 3️⃣ Navigate to checkout page with all Kashier params
+      router.push(
+        `/checkout?orderId=${orderId}&amount=${amount}&currency=${currency}&hash=${hash}&merchantId=${merchantId}&apiKey=${apiKey}&cart=${cartData}`
+      );
     } catch (err) {
       toast.error("paymentFailed");
     } finally {
@@ -75,13 +88,16 @@ export default function Cart() {
 
   return (
     <div className="pt-20 lg:pt-35 mt-10">
-      <div className="bg-gray-100 pt-5 ">
+      <div className="bg-gray-100 pt-5">
         <Breadcrumbs crumbs={crumbs} />
         {items.length > 0 ? (
           <div className="flex gap-5 flex-col lg:flex-row container">
             <div className="flex lg:w-3/4 md:w-full flex-col">
               {items.map((item) => (
-                <div key={item.id} className="relative flex flex-col md:items-center md:pl-20 md:pb-6 md:pr-5 p-2 md:flex-row md:justify-between border mb-8 bg-white border-black rounded-sm">
+                <div
+                  key={item.id}
+                  className="relative flex flex-col md:items-center md:pl-20 md:pb-6 md:pr-5 p-2 md:flex-row md:justify-between border mb-8 bg-white border-black rounded-sm"
+                >
                   <div className="flex gap-3 pt-9 md:pt-3">
                     <div className="border rounded-sm p-1 flex-shrink-0">
                       <Image
@@ -119,7 +135,9 @@ export default function Cart() {
                       >
                         <Plus />
                       </span>
-                      <span className="cursor-auto border py-2 font-semibold px-4">{item.qty}</span>
+                      <span className="cursor-auto border py-2 font-semibold px-4">
+                        {item.qty}
+                      </span>
                       <span
                         className="cursor-pointer border rounded-l-md py-2 px-3"
                         onClick={() => {
@@ -150,15 +168,14 @@ export default function Cart() {
                 </div>
               ))}
             </div>
+
             <div className="bg-white lg:w-1/4 md:w-full h-fit rounded-sm p-6">
               <div className="border-b-1">
                 <h2 className="font-medium text-sm">{t("orderSummary")}</h2>
                 <div className="flex justify-between py-5 items-center">
                   <h3 className="font-normal text-sm">{t("subtotal")}</h3>
                   <div className="flex items-center">
-                    <h3 className="font-semibold text-base">
-                      {items.reduce((sum, i) => sum + i.price * i.qty, 0)}
-                    </h3>
+                    <h3 className="font-semibold text-base">{totalAmount}</h3>
                     <SaudiRiyal className="w-4 h-4" />
                   </div>
                 </div>
@@ -181,9 +198,7 @@ export default function Cart() {
               <div className="flex justify-between py-5 items-center">
                 <h3 className="font-normal text-base">{t("total")}</h3>
                 <div className="flex items-center">
-                  <h3 className="font-semibold text-base">
-                    {items.reduce((sum, i) => sum + i.price * i.qty, 0)}
-                  </h3>
+                  <h3 className="font-semibold text-base">{totalAmount}</h3>
                   <SaudiRiyal className="w-4 h-4" />
                 </div>
               </div>
@@ -215,7 +230,6 @@ export default function Cart() {
         )}
       </div>
 
-      
       <div className="hidden">
         <UserS ref={userDialogRef} />
       </div>

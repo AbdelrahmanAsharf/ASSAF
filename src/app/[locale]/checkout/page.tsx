@@ -1,7 +1,213 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 // src/app/[locale]/checkout/page.tsx
 "use client";
+
+import { useParams, useSearchParams } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
+import { useUser } from "@clerk/nextjs";
+import Image from "next/image";
+import Link from "next/link";
+import { SaudiRiyal, Lock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Sheet, SheetContent, SheetFooter,
+  SheetHeader, SheetTitle, SheetTrigger,
+} from "@/components/ui/sheet";
+import { Spinner } from "@/components/ui/spinner";
+
+// Test URL — غيّرها لـ https://iframe.kashier.io/payment في Production
+const KASHIER_HPP_URL = "https://test-iframe.kashier.io/payment";
+const CALLBACK_BASE = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+
+export default function CheckoutPage() {
+  const { locale } = useParams() as { locale: string };
+  const searchParams = useSearchParams();
+  const t = useTranslations("checkout");
+  const { user, isLoaded } = useUser();
+  const [showCoupon, setShowCoupon] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
+  const isRtl = locale === "ar";
+
+  const orderId    = searchParams.get("orderId");
+  const amount     = searchParams.get("amount");
+  const currency   = searchParams.get("currency") || "EGP";
+  const hash       = searchParams.get("hash");
+  const merchantId = searchParams.get("merchantId");
+  const cartParam  = searchParams.get("cart");
+
+  let cartItems: Array<{
+    id: string; title: string; image: string;
+    price: number; qty: number; total: number;
+  }> = [];
+
+  if (cartParam) {
+    try { cartItems = JSON.parse(decodeURIComponent(cartParam)); }
+    catch { console.error("Failed to parse cart"); }
+  }
+
+  useEffect(() => {
+    if (isLoaded && (!user || !orderId || !amount || !hash || !merchantId)) {
+      window.location.href = `/${locale}/cart`;
+    }
+  }, [isLoaded, user, orderId, amount, hash, merchantId, locale]);
+
+  if (!isLoaded || !user || !orderId || !amount || !hash || !merchantId) return null;
+
+  // ✅ الـ HPP URL — بس المتغيرات المطلوبة، بدون apiKey
+  const callbackUrl = `${CALLBACK_BASE}/api/kashier/callback?locale=${locale}`;
+  const kashierUrl =
+    `${KASHIER_HPP_URL}` +
+    `?mid=${encodeURIComponent(merchantId)}` +
+    `&orderId=${encodeURIComponent(orderId)}` +
+    `&amount=${encodeURIComponent(amount)}` +
+    `&currency=${encodeURIComponent(currency)}` +
+    `&hash=${encodeURIComponent(hash)}` +
+    `&merchantRedirect=${encodeURIComponent(callbackUrl)}` +
+    `&display=${locale === "ar" ? "ar" : "en"}`;
+
+  const handlePay = () => {
+    setRedirecting(true);
+    window.location.href = kashierUrl;
+  };
+
+  return (
+    <div className="min-h-screen py-10 px-4 bg-gray-100">
+      <div className="max-w-4xl mx-auto">
+
+        {cartItems.length > 0 && (
+          <>
+            <div className="bg-white rounded-sm">
+              <div className="flex gap-3 items-center border-b p-4">
+                <div className="border border-gray-400 rounded-sm">
+                  <Image
+                    src="/icon/b7mx5Vp0dkXgh7M718NYszs9hmwKILfSRIemk0Fl (1).png"
+                    alt="store logo" width={120} height={120} className="py-4 px-2"
+                  />
+                </div>
+                <div>
+                  <h2 className="font-medium text-lg text-gray-800">{user.fullName}</h2>
+                  <div className="flex gap-2 text-xs pt-2">
+                    <Link href="/cart" className="text-gray-400">{t("orderFrom")}</Link>
+                    <span>/</span>
+                    <span className="text-gray-700">{t("paymentDetails")}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 flex flex-col gap-4">
+                <div className="flex justify-between items-center text-xl font-semibold">
+                  <h2>{t("orderSummary")}</h2>
+                  <div className="flex items-center gap-1">
+                    <span>{amount}</span>
+                    <SaudiRiyal className="w-4 h-4" />
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <div className="flex gap-2">
+                    {cartItems.map((item) => (
+                      <div key={item.id} className="p-1 rounded-full border">
+                        <Image src={item.image} alt={item.title} width={20} height={20} className="w-5 h-5 object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => setShowCoupon(!showCoupon)}
+                    className="text-sm font-normal text-red-400 cursor-pointer transition hover:underline"
+                  >
+                    {t("haveCoupon")}
+                  </button>
+                </div>
+
+                {showCoupon && (
+                  <div className="w-full animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="flex">
+                      <Input type="text" placeholder={t("enterCoupon")} className="rounded-r-sm rounded-l-none focus-visible:ring-0" />
+                      <span className="rounded-l-sm bg-black text-white px-4 py-2 font-normal text-sm">{t("apply")}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <Sheet>
+              <div className="flex items-center justify-center my-4">
+                <SheetTrigger asChild>
+                  <Button variant="outline" className="w-25 rounded-3xl cursor-pointer font-normal text-xs border border-gray-300 hover:bg-white hover:border-gray-400">
+                    {t("orderDetails")}
+                  </Button>
+                </SheetTrigger>
+              </div>
+              <SheetContent side={isRtl ? "right" : "left"} className="flex flex-col h-full p-0">
+                <SheetHeader className="p-4 border-b">
+                  <SheetTitle>{t("orderDetails")}</SheetTitle>
+                </SheetHeader>
+                <div className="flex-1 overflow-y-auto p-4">
+                  {cartItems.map((item) => (
+                    <div key={item.id} className="border-t pt-4 first:border-t-0">
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-3">
+                          <div className="relative">
+                            <Image src={item.image} alt={item.title} width={48} height={48} className="w-12 h-12 object-cover rounded-lg" />
+                            <span className="absolute -top-2 -right-2 text-black text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                              {item.qty}
+                            </span>
+                          </div>
+                          <h3 className="font-medium text-sm">{item.title}</h3>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <span className="font-semibold">{item.total}</span>
+                          <SaudiRiyal className="w-4 h-4" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <SheetFooter className="border-t text-gray-600 py-10">
+                  <div className="flex justify-between w-full text-xl font-semibold">
+                    <span>{t("total")}</span>
+                    <div className="flex items-center gap-1">
+                      <span>{amount}</span>
+                      <SaudiRiyal className="w-5 h-5" />
+                    </div>
+                  </div>
+                </SheetFooter>
+              </SheetContent>
+            </Sheet>
+          </>
+        )}
+
+        <div className="bg-white rounded-2xl shadow-sm p-6">
+          <p className="text-sm text-gray-500 text-center mb-2">{t("securePayment")}</p>
+          <p className="text-xs text-center text-gray-400 mb-6">
+            {locale === "ar"
+              ? "ستُحوَّل إلى صفحة الدفع الآمنة الخاصة بـ Kashier"
+              : "You will be redirected to Kashier's secure payment page"}
+          </p>
+
+          <Button
+            onClick={handlePay}
+            disabled={redirecting}
+            className="w-full bg-black text-white py-6 rounded-xl text-lg font-bold cursor-pointer hover:bg-gray-800 transition"
+          >
+            {redirecting ? <Spinner /> : (
+              locale === "ar" ? `ادفع ${amount} ${currency}` : `Pay ${amount} ${currency}`
+            )}
+          </Button>
+
+          <p className="text-xs text-center text-gray-400 mt-4 flex items-center justify-center gap-1">
+            <Lock className="w-3 h-3" />
+            {locale === "ar" ? "مدفوعات آمنة عبر Kashier" : "Secured by Kashier"}
+          </p>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+// src/app/[locale]/checkout/page.tsx/*
+/*"use client";
 
 import { useParams, useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -118,7 +324,6 @@ export default function CheckoutPage() {
                                     <div className="flex gap-2 ">
                                         {cartItems.map((item) => (
                                             <div key={item.id} className=" p-1 rounded-full border">
-                                                {/* الصورة */}
                                                 <Image
                                                     src={item.image}
                                                     alt={item.title}
@@ -168,12 +373,10 @@ export default function CheckoutPage() {
                                 </SheetTrigger>
                             </div>
                             <SheetContent side={isRtl ? "right" : "left"} className="flex flex-col h-full p-0">
-                                {/* العنوان */}
                                 <SheetHeader className="p-4 border-b">
                                     <SheetTitle>{t("orderDetails")}</SheetTitle>
                                 </SheetHeader>
 
-                                {/* قائمة المنتجات - تتسكرول لو كتير */}
                                 <div className="flex-1 overflow-y-auto p-4">
                                     {cartItems.map((item) => (
                                         <div key={item.id} className="border-t pt-4 first:border-t-0">
@@ -320,3 +523,4 @@ function CheckoutForm({
         </form>
     );
 }
+*/

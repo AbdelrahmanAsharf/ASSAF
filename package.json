@@ -6,20 +6,17 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "seed": "prisma db seed"
+    "lint": "next lint"
   },
   "type": "module",
-  "prisma": {
-    "seed": "ts-node prisma/seed.cjs"
-  },
   "dependencies": {
     "@clerk/localizations": "^3.25.3",
     "@clerk/nextjs": "^6.36.3",
     "@hookform/resolvers": "^5.2.2",
     "@mantine/core": "^8.2.7",
     "@mantine/hooks": "^8.2.7",
-    "@prisma/client": "^6.14.0",
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-dialog": "^1.1.15",
@@ -48,7 +45,7 @@
     "next-themes": "^0.4.6",
     "nodemailer": "^7.0.6",
     "openai": "^5.13.1",
-    "prisma": "^6.14.0",
+    "radix-ui": "^1.6.0",
     "react": "19.1.0",
     "react-day-picker": "^9.11.1",
     "react-dom": "19.1.0",
@@ -75,6 +72,7 @@
     "esbuild": "^0.19.11",
     "eslint": "^9",
     "eslint-config-next": "15.4.6",
+    "prisma": "^7.8.0",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "tsx": "^4.20.6",

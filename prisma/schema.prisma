@@ -1,92 +1,89 @@
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 generator client {
   provider = "prisma-client-js"
+  
 }
 
 model Category {
-  id            String        @id @default(uuid())
-  stableId      String?       @unique
+  id        String   @id @default(cuid())
+  nameAr    String
+  nameEn    String
+  stableId  String   @unique
+  createdAt DateTime @default(now())
+
+  subCategories SubCategory[]
+  products      Product[] 
+}
+
+model SubSubCategory {
+  id            String      @id @default(cuid())
   nameAr        String
   nameEn        String
-  subCategories SubCategory[]
-  products      Product[]     @relation("ProductCategories") // many-to-many
+  stableId      String      @unique
+  subCategoryId String
+  createdAt     DateTime    @default(now())
+  subCategory   SubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+  products      Product[]
 }
 
 model SubCategory {
-  id         String    @id @default(uuid())
-  stableId   String?   @unique
-  nameAr     String
-  nameEn     String
-  categoryId String
-  category   Category  @relation(fields: [categoryId], references: [id])
-  products   Product[] @relation("ProductSubCategories")
+  id               String           @id @default(cuid())
+  nameAr           String
+  nameEn           String
+  stableId         String           @unique
+  categoryId       String
+  createdAt        DateTime         @default(now())
+  category         Category         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  products         Product[]
+  subSubCategories SubSubCategory[]
 }
 
 model Product {
-  id            String          @id @default(uuid())
-  stableId      String         @unique
-  titleAr       String
-  titleEn       String
-  descriptionAr String?
-  descriptionEn String?
-  oldPrice      Float           @default(0)
-  price         Float
-  imageUrl      String
-  modelNumber   String?
-  compositionAr String?
-  compositionEn String?
-  inspirationEn String?
-  inspirationAr String?
-  size          String?         // الحجم (100ml, 200ml ...)
-  gender        String?         // Male | Female | Unisex
-  warrantyAr    String?
-  warrantyEn    String?
-  categories    Category[]      @relation("ProductCategories")
-  subCategories SubCategory[]   @relation("ProductSubCategories")
-  stock         Int             @default(0)
-  createdAt     DateTime        @default(now())
-  orderProducts OrderProduct[]
-  media         ProductMedia[]  @relation("ProductMedia")
-}
-
-model ProductMedia {
-  id        String     @id @default(cuid())
-  url       String
-  type      MediaType
-  language  Language   // 👈 عربي / إنجليزي
-  product   Product    @relation("ProductMedia", fields: [productId], references: [id])
-  productId String
-}
-
-enum Language {
-  AR
-  EN
-  BOTH
-}
-
-enum MediaType {
-  IMAGE
+  id               String          @id @default(cuid())
+  nameAr           String
+  nameEn           String
+  stableId         String          @unique
+  price            Float
+  oldPrice         Float           @default(0)
+  stock            Int             @default(0)
+  size             String?
+  gender           String?
+  imageUrl         String
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  categoryId       String?
+  category         Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  subCategoryId    String?
+  subCategory      SubCategory?    @relation(fields: [subCategoryId], references: [id], onDelete: SetNull)
+  subSubCategoryId String?
+  subSubCategory   SubSubCategory? @relation(fields: [subSubCategoryId], references: [id], onDelete: SetNull)
+  orderProducts    OrderProduct[]
 }
 
 model User {
-  id        String   @id @default(uuid())
-  clerkId   String   @unique
-  email     String?
-  firstName String?
-  lastName  String?
+  id        String    @id @default(uuid())
+  clerkId   String    @unique
+  email     String
   imageUrl  String?
+  firstName String
+  lastName  String
+  phone     String
+  birthday  DateTime?
+  sex       String?
+  role      UserRole  @default(USER)
   orders    Order[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Order {
   id        String         @id @default(uuid())
   userId    String
+  paymobOrderId String?        @unique  // ✅ أضف ده
+  status        String         @default("PENDING") // ✅ وده ل
   products  OrderProduct[]
   createdAt DateTime       @default(now())
   user      User           @relation(fields: [userId], references: [id])
@@ -98,9 +95,14 @@ model OrderProduct {
   id        String  @id @default(uuid())
   orderId   String
   productId String
-  quantity  Int     @default(1)  // الكمية
+  quantity  Int     @default(1)
   order     Order   @relation(fields: [orderId], references: [id])
   product   Product @relation(fields: [productId], references: [id])
 
   @@unique([orderId, productId])
+}
+
+enum UserRole {
+  USER
+  ADMIN
 }

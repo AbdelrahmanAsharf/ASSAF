@@ -1,4 +1,3 @@
-
 "use server";
 
 import { db } from "@/lib/prisma";
@@ -13,36 +12,33 @@ async function getPrismaUser() {
     where: { clerkId: clerkUser.id },
     update: {
       email: clerkUser.emailAddresses[0]?.emailAddress,
-      firstName: clerkUser.firstName,
-      lastName: clerkUser.lastName,
-      imageUrl: clerkUser.imageUrl,
+      firstName: clerkUser.firstName ?? "",
+      lastName: clerkUser.lastName ?? "",
+      imageUrl: clerkUser.imageUrl ?? "",
     },
     create: {
       clerkId: clerkUser.id,
       email: clerkUser.emailAddresses[0]?.emailAddress,
-      firstName: clerkUser.firstName,
-      lastName: clerkUser.lastName,
-      imageUrl: clerkUser.imageUrl,
+      firstName: clerkUser.firstName ?? "",
+      lastName: clerkUser.lastName ?? "",
+      imageUrl: clerkUser.imageUrl ?? "",
+      phone: "", // ✅ ضيف ده
     },
   });
 }
 
-
-
 export async function createOrder(
   products: { productId: string; quantity: number }[],
-  locale: "ar" | "en" = "ar" // ← أضف الـ locale هنا
+  locale: "ar" | "en" = "ar", // ← أضف الـ locale هنا
 ) {
   const user = await getPrismaUser();
 
-  
   const productIds = products.map((p) => p.productId);
   const dbProducts = await db.product.findMany({
     where: { id: { in: productIds } },
-    select: { id: true, stock: true, titleAr: true, titleEn: true },
+  select: { id: true, stock: true, nameAr: true, nameEn: true }, // ✅
   });
 
-  
   for (const item of products) {
     const product = dbProducts.find((p) => p.id === item.productId);
     if (!product) throw new Error(`المنتج غير موجود: ${item.productId}`);
@@ -50,18 +46,16 @@ export async function createOrder(
       throw new Error(
         locale === "ar"
           ? `الكمية المطلوبة غير متوفرة لـ "${
-              product.titleAr || product.titleEn
+              product.nameAr || product.nameEn
             }" (متوفر: ${product.stock})`
           : `Not enough stock for "${
-              product.titleEn || product.titleAr
-            }" (available: ${product.stock})`
+              product.nameEn || product.nameAr
+            }" (available: ${product.stock})`,
       );
     }
   }
 
-  
   const order = await db.$transaction(async (tx) => {
-  
     const newOrder = await tx.order.create({
       data: {
         userId: user.id,
@@ -78,8 +72,8 @@ export async function createOrder(
             product: {
               select: {
                 id: true,
-                titleAr: true,
-                titleEn: true,
+                nameAr: true,
+                nameEn: true,
                 price: true,
                 imageUrl: true,
               },
@@ -95,7 +89,7 @@ export async function createOrder(
         where: { id: item.productId },
         data: {
           stock: {
-            decrement: item.quantity, 
+            decrement: item.quantity,
           },
         },
       });
@@ -105,7 +99,7 @@ export async function createOrder(
   });
 
   revalidatePath("/[locale]/orders");
-  revalidatePath("/[locale]/products/[id]"); 
+  revalidatePath("/[locale]/products/[id]");
   return order;
 }
 
@@ -120,8 +114,8 @@ export async function getUserOrders() {
           product: {
             select: {
               id: true,
-              titleAr: true,
-              titleEn: true,
+              nameAr: true,
+              nameEn: true,
               price: true,
               imageUrl: true,
             },
@@ -132,5 +126,3 @@ export async function getUserOrders() {
     orderBy: { createdAt: "desc" },
   });
 }
-
-

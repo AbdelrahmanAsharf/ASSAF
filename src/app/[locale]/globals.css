@@ -1,9 +1,9 @@
 /* src/app/[locale]/globals.css */
+@import url("https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;500;700;800;900&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
-
 
 @theme inline {
   --color-background: var(--background);
@@ -120,9 +120,20 @@
   }
 
   body {
+    font-family:
+      "Tajawal",
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      sans-serif;
     @apply bg-background text-foreground;
   }
 
+  .font-tajawal {
+    font-family: "Tajawal", system-ui, sans-serif;
+  }
   .container {
     @apply mx-auto px-4 sm:px-6 md:px-1 lg:px-10 xl:px-20 max-w-7xl;
   }
@@ -153,7 +164,6 @@
 
   ::-webkit-scrollbar-thumb {
     background: #000000;
-    
   }
 
   #scroll-to-top {
@@ -177,99 +187,106 @@
     align-items: center;
     justify-content: center;
   }
-  
-[dir="rtl"] [data-slot="switch-thumb"][data-state="checked"] {
+
+  [dir="rtl"] [data-slot="switch-thumb"][data-state="checked"] {
     transform: translateX(calc(-100% + 1px)) !important;
-}
+  }
 
-[dir="rtl"] [data-slot="switch-thumb"][data-state="unchecked"] {
+  [dir="rtl"] [data-slot="switch-thumb"][data-state="unchecked"] {
     transform: translateX(-13) !important;
-}
-  
-.phone-input-rtl .react-tel-input {
-    direction: rtl;
-}
+  }
 
-.phone-input-rtl .react-tel-input .form-control {
-    padding-right: 58px !important;
-    padding-left: 12px !important;
+  /* RTL Phone Input Fix */
+  .phone-input-rtl .react-tel-input {
+    direction: ltr;
+  }
+
+  .phone-input-rtl .react-tel-input .form-control {
+    text-align: right;
+    padding-right: 52px;
+    padding-left: 12px;
+    direction: ltr;
+    unicode-bidi: plaintext;
+  }
+
+  .phone-input-rtl .react-tel-input .flag-dropdown {
+    right: 0;
+    left: auto;
+    border-radius: 0 8px 8px 0;
+    border-right: 1px solid #cacaca;
+    border-left: none;
+  }
+
+  .phone-input-rtl .react-tel-input .selected-flag {
+    padding: 0 8px 0 0;
+  }
+
+  /* ✅ ده اللي ناقص — الـ dropdown نفسه */
+  .phone-input-rtl .react-tel-input .country-list {
+    right: 0;
+    left: auto;
     text-align: right;
     direction: rtl;
-}
+  }
 
-.phone-input-rtl .react-tel-input .flag-dropdown {
-    left: auto !important;
-    right: 0 !important;
-    border-radius: 0 6px 6px 0 !important;
-}
+  .phone-input-rtl .react-tel-input .country-list .country {
+    display: flex;
+    flex-direction: row-reverse; /* ✅ flag يمين، اسم يسار */
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 8px 12px;
+  }
 
-.phone-input-rtl .react-tel-input .selected-flag {
-    border-radius: 0 6px 6px 0 !important;
-}
-
-
-.phone-input-rtl .react-tel-input .selected-flag .arrow {
-    left: 11px !important;
-    right: 20px !important;
-    transform: scaleX(-1); 
-}
-
-.phone-input-rtl .react-tel-input .selected-flag .arrow.up {
-    transform: scaleX(-1) rotate(180deg);
-}
-
-
-.phone-input-rtl .react-tel-input .country-list {
-    text-align: right;
-    direction: rtl;
-    left: auto !important;
-    right: 0 !important;
-}
-
-.phone-input-rtl .react-tel-input .country-list .country {
-    padding: 8px 12px 8px 8px;
-    text-align: right;
-}
-
-.phone-input-rtl .react-tel-input .country-list .flag {
-    margin-left: 8px;
-    margin-right: 0;
-}
-
-.phone-input-rtl .react-tel-input .country-list .dial-code {
+  .phone-input-rtl .react-tel-input .country-list .country .dial-code {
+    margin-right: auto; /* ✅ الكود يروح أقصى يسار */
     margin-left: 0;
-    margin-right: auto;
-}
+  }
 
-.phone-input-rtl .react-tel-input .country-list .country-name {
-    margin-left: 0;
-    margin-right: 6px;
-}
-.toast-responsive {
-  @apply w-full max-w-xs mx-auto text-sm font-medium;
-}
+  .phone-input-rtl .react-tel-input .country-list .search {
+    direction: rtl;
+    text-align: right;
+    display: flex; /* ✅ خلي العدسة والـ input جنب بعض */
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+  }
 
-@media (min-width: 640px) {
+  .phone-input-rtl .react-tel-input .country-list .search-emoji {
+    order: 1; /* ✅ العدسة على اليمين */
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .phone-input-rtl .react-tel-input .country-list .search-box {
+    order: 0; /* ✅ الـ input على الشمال */
+    direction: ltr; /* ✅ الكتابة فيه LTR عشان search يشتغل صح */
+    text-align: right;
+    width: 100%;
+    flex: 1;
+  }
   .toast-responsive {
-    @apply max-w-sm;
+    @apply w-full max-w-xs mx-auto text-sm font-medium;
+  }
+
+  @media (min-width: 640px) {
+    .toast-responsive {
+      @apply max-w-sm;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .toast-responsive {
+      @apply max-w-md;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .toast-responsive {
+      @apply max-w-lg;
+    }
   }
 }
-
-@media (min-width: 768px) {
-  .toast-responsive {
-    @apply max-w-md;
-  }
-}
-
-@media (min-width: 1024px) {
-  .toast-responsive {
-    @apply max-w-lg;
-  }
-}
-
-}
-
-
 
 @keyframes fastPulse {
   0% {

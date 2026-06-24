@@ -188,7 +188,8 @@
     "total": "الإجمالي",
     "cardInfo": "بيانات البطاقة",
     "payNow": "ادفع الآن",
-    "securePayment": "الدفع آمن ومشفر"
+    "securePayment": "الدفع آمن ومشفر",
+    "paymentFailed": "فشل الدفع، حاول مرة أخرى."
   },
   "success": {
     "title": "تم الدفع بنجاح!",

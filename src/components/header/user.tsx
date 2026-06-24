@@ -24,8 +24,6 @@ import {
 } from "@/components/ui/dialog";
 import { User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
 import { useLocale, useTranslations } from "next-intl";
 import {
   createEmailSchema,
@@ -38,15 +36,14 @@ import { checkEmailExists } from "@/actions/check-email-exists";
 import OtpStep from "../auth/OtpStep";
 import { useState, useRef, forwardRef, useImperativeHandle } from "react";
 import { useToast } from "@/utils/toast";
-import { syncUserToPrisma } from "@/actions/sync-user"; // ✅ استيراد دالة المزامنة
+import { syncUserToPrisma } from "@/actions/sync-user";
 
-// Export the type for external use
 export interface UserSRef {
   openDialog: () => void;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-interface UserSProps { }
+interface UserSProps {}
 
 export const UserS = forwardRef<UserSRef, UserSProps>((props, ref) => {
   const { isLoaded: signInLoaded, signIn } = useSignIn();
@@ -55,6 +52,8 @@ export const UserS = forwardRef<UserSRef, UserSProps>((props, ref) => {
 
   const [step, setStep] = useState<"email" | "otp" | "details">("email");
   const [email, setEmail] = useState("");
+  // ✅ نوع الـ OTP: signIn للمستخدم الموجود، signUp للجديد
+  const [otpMode, setOtpMode] = useState<"signIn" | "signUp">("signIn");
   const [isEmailLoading, setIsEmailLoading] = useState(false);
   const [isDetailsLoading, setIsDetailsLoading] = useState(false);
 
@@ -67,11 +66,10 @@ export const UserS = forwardRef<UserSRef, UserSProps>((props, ref) => {
 
   const triggerRef = useRef<HTMLButtonElement>(null);
 
-  // Expose method to open dialog from parent component
   useImperativeHandle(ref, () => ({
     openDialog: () => {
       triggerRef.current?.click();
-    }
+    },
   }));
 
   const emailForm = useForm<EmailSchema>({
@@ -96,10 +94,11 @@ export const UserS = forwardRef<UserSRef, UserSProps>((props, ref) => {
       const { exists } = await checkEmailExists(values.email);
 
       if (exists) {
+        // ✅ مستخدم موجود: signIn مباشرة وبعت OTP
         await signIn.create({ identifier: values.email });
 
         const factor = signIn.supportedFirstFactors?.find(
-          (f: any) => f.strategy === "email_code"
+          (f: any) => f.strategy === "email_code",
         ) as { emailAddressId: string };
 
         if (!factor?.emailAddressId) throw new Error("Email factor not found");
@@ -109,52 +108,50 @@ export const UserS = forwardRef<UserSRef, UserSProps>((props, ref) => {
           emailAddressId: factor.emailAddressId,
         });
 
-        toast.success("otp");
         setEmail(values.email);
+        setOtpMode("signIn");
         setStep("otp");
+        toast.success("otp");
       } else {
-        await signUp.create({ emailAddress: values.email });
-        toast.success("newUser");
+        // ✅ مستخدم جديد: روح على Details الأول، مش create هنا
         setEmail(values.email);
         setStep("details");
       }
     } catch (err: any) {
-      if (err.errors?.[0]?.code === "identifier_not_found") {
-        try {
-          await signUp.create({ emailAddress: values.email });
-          toast.success("newUser");
-          setEmail(values.email);
-          setStep("details");
-        } catch (signUpErr: any) {
-          toast.error("signupError");
-        }
-      } else {
-        toast.error("signupError");
-      }
+      toast.error("signupError");
     } finally {
       setIsEmailLoading(false);
     }
   }
 
   async function handleSaveDetails(values: DetailsSchema) {
-    if (!signUp) return;
+    if (!signUpLoaded || !signUp) return;
 
     setIsDetailsLoading(true);
+
     try {
-     await signUp.update({
-        firstName: values.firstName,
-        lastName: values.lastName,
-        unsafeMetadata: { phone: values.phone },
+      // ✅ create مرة واحدة بس بكل البيانات
+      await signUp.create({
+        emailAddress: email,
+
+        unsafeMetadata: {
+          firstName: values.firstName,
+          lastName: values.lastName,
+          phone: values.phone,
+        },
       });
 
-        if ( signUp.createdSessionId) {
-          await setActive({ session: signUp.createdSessionId });
-          await syncUserToPrisma();
-          toast.success("detailssuccess");
-          triggerRef.current?.click();
-        } 
+      // ✅ بعد create، بعت OTP للإيميل
+      await signUp.prepareEmailAddressVerification({
+        strategy: "email_code",
+      });
+
+      setOtpMode("signUp");
+      setStep("otp");
+      toast.success("otp");
     } catch (err: any) {
-      toast.error(err.message || "detailsError");
+      console.error(err);
+      toast.error("detailsError");
     } finally {
       setIsDetailsLoading(false);
     }
@@ -168,12 +165,12 @@ export const UserS = forwardRef<UserSRef, UserSProps>((props, ref) => {
         </button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[380px] rounded-sm" dir={dir}>
+      <DialogContent className="sm:max-w-95 rounded-sm" dir={dir}>
         <DialogHeader className="items-center gap-6 mb-5">
           <DialogDescription className="rounded-full border-gray-200 border p-6">
             <User />
           </DialogDescription>
-          <DialogTitle className="text-gray-700 !font-bold">
+          <DialogTitle className="text-gray-700 font-bold!">
             {tLogin("title")}
           </DialogTitle>
         </DialogHeader>
@@ -182,7 +179,10 @@ export const UserS = forwardRef<UserSRef, UserSProps>((props, ref) => {
           <>
             <div id="clerk-captcha"></div>
             <Form {...emailForm}>
-              <form onSubmit={emailForm.handleSubmit(handleEmail)} className="space-y-8">
+              <form
+                onSubmit={emailForm.handleSubmit(handleEmail)}
+                className="space-y-8"
+              >
                 <FormField
                   control={emailForm.control}
                   name="email"
@@ -217,83 +217,86 @@ export const UserS = forwardRef<UserSRef, UserSProps>((props, ref) => {
         {step === "otp" && (
           <OtpStep
             email={email}
-            onBack={() => setStep("email")}
-            onSuccess={() => {
+            // ✅ بعت mode عشان OtpStep يعرف يتعامل مع signIn أو signUp
+            mode={otpMode}
+            onBack={() => setStep(otpMode === "signIn" ? "email" : "details")}
+            onSuccess={async () => {
+              // ✅ لو signUp، بعمل sync بعد نجاح الـ OTP
+              if (otpMode === "signUp") {
+                await syncUserToPrisma();
+              }
               triggerRef.current?.click();
             }}
           />
         )}
 
         {step === "details" && (
-          <Form {...detailsForm}>
-            <form
-              onSubmit={detailsForm.handleSubmit(handleSaveDetails)}
-              className="space-y-4"
-            >
-              <FormField
-                control={detailsForm.control}
-                name="firstName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{tLogin("firstName")}</FormLabel>
-                    <FormControl>
-                      <Input placeholder={tLogin("firstNamePlaceholder")} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={detailsForm.control}
-                name="lastName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{tLogin("lastName")}</FormLabel>
-                    <FormControl>
-                      <Input placeholder={tLogin("lastNamePlaceholder")} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={detailsForm.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem className="flex-1 min-w-[200px]">
-                    <FormLabel>{tLogin("phone")}</FormLabel>
-                    <FormControl>
-                      <div className={locale === "ar" ? "phone-input-rtl" : ""}>
-                        <PhoneInput
-                          country={defaultCountry}
-                          value={field.value}
-                          onChange={field.onChange}
-                          onBlur={() => detailsForm.trigger("phone")}
-                          inputClass="!w-full !h-11"
-                          containerClass={locale === "ar" ? "rtl-phone-container" : ""}
-                          buttonClass={locale === "ar" ? "rtl-phone-button" : ""}
-                          dropdownClass={locale === "ar" ? "rtl-phone-dropdown" : ""}
-                          enableSearch
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage className="min-h-[20px]" />
-                  </FormItem>
-                )}
-              />
-              <Button
-                type="submit"
-                className="w-full cursor-pointer"
-                disabled={isDetailsLoading}
+          <>
+            <div id="clerk-captcha"></div>
+            <Form {...detailsForm}>
+              <form
+                onSubmit={detailsForm.handleSubmit(handleSaveDetails)}
+                className="space-y-4"
               >
-                {isDetailsLoading ? <Spinner /> : tLogin("submitButton")}
-              </Button>
-            </form>
-          </Form>
+                <FormField
+                  control={detailsForm.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{tLogin("firstName")}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={tLogin("firstNamePlaceholder")}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={detailsForm.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{tLogin("lastName")}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={tLogin("lastNamePlaceholder")}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={detailsForm.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem className="flex-1 min-w-50">
+                      <FormLabel>{tLogin("phone")}</FormLabel>
+                      <FormControl>
+                        <Input type="tel" placeholder={t("phone")} {...field} />
+                      </FormControl>
+                      <FormMessage className="min-h-5" />
+                    </FormItem>
+                  )}
+                />
+                <Button
+                  type="submit"
+                  className="w-full cursor-pointer"
+                  disabled={isDetailsLoading}
+                >
+                  {isDetailsLoading ? <Spinner /> : tLogin("submitButton")}
+                </Button>
+              </form>
+            </Form>{" "}
+          </>
         )}
       </DialogContent>
     </Dialog>
   );
 });
 
-UserS.displayName = 'UserS';
+UserS.displayName = "UserS";

@@ -9,10 +9,12 @@ import { Spinner } from "@/components/ui/spinner";
 import { ArrowRight } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { useToast } from "@/utils/toast";
-import { useSignIn, useClerk } from "@clerk/nextjs";
+import { useSignIn, useSignUp, useClerk } from "@clerk/nextjs";
 
 type OtpStepProps = {
   email: string;
+  // ✅ mode جديد: signIn للمستخدم الموجود، signUp للجديد
+  mode: "signIn" | "signUp";
   onBack: () => void;
   onSuccess: () => void;
 };
@@ -20,8 +22,9 @@ type OtpStepProps = {
 const RESEND_DELAY = 30;
 const OTP_EXPIRY = 120;
 
-export default function OtpStep({ email, onBack, onSuccess }: OtpStepProps) {
-  const { signIn, isLoaded } = useSignIn();
+export default function OtpStep({ email, mode, onBack, onSuccess }: OtpStepProps) {
+  const { signIn, isLoaded: signInLoaded } = useSignIn();
+  const { signUp, isLoaded: signUpLoaded } = useSignUp();
   const { setActive } = useClerk();
   const tLogin = useTranslations("login");
   const locale = useLocale();
@@ -34,7 +37,6 @@ export default function OtpStep({ email, onBack, onSuccess }: OtpStepProps) {
   const [isResendLoading, setIsResendLoading] = useState(false);
   const [isVerifyLoading, setIsVerifyLoading] = useState(false);
 
-  // لمنع التحقق التلقائي أكتر من مرة
   const autoVerifyTriggered = useRef(false);
   const verifyTimeout = useRef<NodeJS.Timeout | null>(null);
 
@@ -44,112 +46,109 @@ export default function OtpStep({ email, onBack, onSuccess }: OtpStepProps) {
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
-  // Timer: Resend delay
   useEffect(() => {
-    if (timer <= 0) {
-      setCanResend(true);
-      return;
-    }
+    if (timer <= 0) { setCanResend(true); return; }
     const id = setInterval(() => setTimer((t) => t - 1), 1000);
     return () => clearInterval(id);
   }, [timer]);
 
-  // Timer: OTP expiry
   useEffect(() => {
     if (expiry <= 0) {
       setOtp("");
       setCanResend(true);
-      error(("otpExpired"));
+      error("otpExpired");
       return;
     }
     const id = setInterval(() => setExpiry((e) => e - 1), 1000);
     return () => clearInterval(id);
   }, [expiry, error]);
 
-  // Resend OTP
+  // ✅ Resend: مختلف حسب mode
   const handleResend = useCallback(async () => {
-    if (!isLoaded || !signIn) return;
-
     setIsResendLoading(true);
     try {
-      const factor = signIn.supportedFirstFactors?.find(
-        (f: any) => f.strategy === "email_code"
-      ) as { emailAddressId: string };
+      if (mode === "signIn") {
+        if (!signInLoaded || !signIn) return;
+        const factor = signIn.supportedFirstFactors?.find(
+          (f: any) => f.strategy === "email_code"
+        ) as { emailAddressId: string };
+        if (!factor?.emailAddressId) throw new Error("Email factor not found");
+        await signIn.prepareFirstFactor({
+          strategy: "email_code",
+          emailAddressId: factor.emailAddressId,
+        });
+      } else {
+        // signUp mode
+        if (!signUpLoaded || !signUp) return;
+        await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+      }
 
-      if (!factor?.emailAddressId) throw new Error("Email factor not found");
-
-      await signIn.prepareFirstFactor({
-        strategy: "email_code",
-        emailAddressId: factor.emailAddressId,
-      });
-
-      // إعادة تعيين كل شيء
       autoVerifyTriggered.current = false;
       setOtp("");
       setTimer(RESEND_DELAY);
       setExpiry(OTP_EXPIRY);
       setCanResend(false);
-
       success("otp");
     } catch (err: any) {
-      error(err.message || ("resendError"));
+      error(err.message || "resendError");
     } finally {
       setIsResendLoading(false);
     }
-  }, [signIn, isLoaded, success, error]);
+  }, [mode, signIn, signInLoaded, signUp, signUpLoaded, success, error]);
 
-  // Verify OTP (بدون handleVerify في deps)
+  // ✅ Verify: مختلف حسب mode
   const verifyOtp = useCallback(async () => {
-    if (!isLoaded || !signIn || otp.length !== 6 || isVerifyLoading) return;
+    if (otp.length !== 6 || isVerifyLoading) return;
 
     setIsVerifyLoading(true);
     try {
-      const result = await signIn.attemptFirstFactor({
-        strategy: "email_code",
-        code: otp,
-      });
-
-      if (result.status === "complete" && signIn.createdSessionId) {
-        await setActive({ session: signIn.createdSessionId });
-        success(("otpsuccess"));
-        onSuccess();
+      if (mode === "signIn") {
+        // مستخدم موجود
+        if (!signInLoaded || !signIn) return;
+        const result = await signIn.attemptFirstFactor({
+          strategy: "email_code",
+          code: otp,
+        });
+        if (result.status === "complete" && signIn.createdSessionId) {
+          await setActive({ session: signIn.createdSessionId });
+          success("otpsuccess");
+          onSuccess();
+        } else {
+          throw new Error("Verification failed");
+        }
       } else {
-        throw new Error("Verification failed");
+        // مستخدم جديد
+        if (!signUpLoaded || !signUp) return;
+        const result = await signUp.attemptEmailAddressVerification({ code: otp });
+        if (result.status === "complete" && result.createdSessionId) {
+          await setActive({ session: result.createdSessionId });
+          success("otpsuccess");
+          onSuccess(); // ✅ onSuccess بتعمل syncUserToPrisma من UserS
+        } else {
+          throw new Error("Verification failed");
+        }
       }
     } catch (err: any) {
-      if (err.code === "code_expired") {
-        error(("otpExpired"));
+      if (err.errors?.[0]?.code === "verification_expired" || err.code === "code_expired") {
+        error("otpExpired");
         setCanResend(true);
         setOtp("");
       } else {
-        error(err.message || ("otperror"));
+        error(err.errors?.[0]?.message || err.message || "otperror");
       }
     } finally {
       setIsVerifyLoading(false);
     }
-  }, [otp, signIn, isLoaded, setActive, onSuccess, success, error, isVerifyLoading]);
+  }, [otp, mode, signIn, signInLoaded, signUp, signUpLoaded, setActive, onSuccess, success, error, isVerifyLoading]);
 
-  // تحقق تلقائي عند كتابة آخر رقم
   useEffect(() => {
     if (otp.length === 6 && !isVerifyLoading && !autoVerifyTriggered.current) {
       autoVerifyTriggered.current = true;
-
-      // إلغاء أي تحقق سابق
       if (verifyTimeout.current) clearTimeout(verifyTimeout.current);
-
-      verifyTimeout.current = setTimeout(() => {
-        verifyOtp();
-      }, 100);
+      verifyTimeout.current = setTimeout(() => { verifyOtp(); }, 100);
     }
-
-    // إعادة تعيين لو المستخدم حذف
-    if (otp.length < 6) {
-      autoVerifyTriggered.current = false;
-    }
-
-    return () => {
-      if (verifyTimeout.current) clearTimeout(verifyTimeout.current);
-    };
+    if (otp.length < 6) { autoVerifyTriggered.current = false; }
+    return () => { if (verifyTimeout.current) clearTimeout(verifyTimeout.current); };
   }, [otp, isVerifyLoading, verifyOtp]);
 
   return (

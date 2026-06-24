@@ -15,7 +15,7 @@ export async function checkEmailExists(email: string): Promise<{ exists: boolean
     });
     return { exists: users.data.length > 0 };
   } catch (error) {
-    console.error("خطأ في فحص الإيميل:", error);
-    return { exists: false };
-  }
+  console.error("خطأ في فحص الإيميل:", error);
+  throw error; // ✅ ارمي الـ error بدل ما ترجع false
+}
 }

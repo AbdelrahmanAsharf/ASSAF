@@ -2,15 +2,11 @@
 import { db } from "@/lib/prisma";
 
 export async function getProductsByCategoryOrSlug(
-  slug: string,
-  locale?: string  
-) {
+  slug: string) {
   const decodedSlug = decodeURIComponent(slug);
   const cleanSlug = decodedSlug.replace(/-/g, " ").trim();
   
-  console.log("Original slug:", slug);
-  console.log("Clean slug:", cleanSlug);
-  console.log("Locale:", locale); 
+
 
 
   if (cleanSlug === "الجديد" || cleanSlug === "new") {

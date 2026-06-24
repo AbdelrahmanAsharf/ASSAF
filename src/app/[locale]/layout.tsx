@@ -2,18 +2,21 @@
 // src/app/[locale]/layout.tsx
 
 import type { Metadata } from "next";
-import "./globals.css";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import { Cairo, Poppins } from "next/font/google";
+import {  Poppins, Tajawal } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import ClientLayout from "./ClientLayout";
 import { getMessages } from "next-intl/server";
+import "./globals.css"; 
+import { getNavs } from "@/actions/navs";
+import { buildNavsFromDB } from "@/lib/slugify";
 
-const cairo = Cairo({
+const tajawal = Tajawal({
   subsets: ["arabic"],
-  weight: ["400", "500", "700"],
-  variable: "--font-cairo",
+  weight: ["400", "500",  "700", "800", "900"],
+  variable: "--font-tajawal",
+  display: "swap",
 });
 
 const poppins = Poppins({
@@ -32,6 +35,7 @@ export const metadata: Metadata = {
   },
 };
 
+
 export default async function LocaleLayout({
   children,
   params,
@@ -45,16 +49,19 @@ export default async function LocaleLayout({
   if (!["ar", "en"].includes(locale)) notFound();
 
   const dir = locale === "ar" ? "rtl" : "ltr" as const;
-  const fontClass = locale === "ar" ? cairo.variable : poppins.variable;
+  const fontClass = locale === "ar" ? tajawal.variable : poppins.variable;
   const messages = await getMessages();
 
 
   const pathname = (await headers()).get("x-pathname") || `/${locale}`;
   (globalThis as any).__NEXT_LOCALE_PATHNAME = pathname;
-
+  const rawNavs = await getNavs();
+  const navs = buildNavsFromDB(rawNavs);
+  
   return (
     <ClerkProvider>
-      <ClientLayout locale={locale} dir={dir} fontClass={fontClass} messages={messages}>
+      <ClientLayout locale={locale} dir={dir} fontClass={fontClass} messages={messages}   navs={navs}
+      >
         {children}
       </ClientLayout>
     </ClerkProvider>

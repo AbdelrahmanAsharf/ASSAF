@@ -1,10 +1,10 @@
 "use client"
 import Image from "next/image";
-import { Barcode, CircleCheck, CircleX, Eye, Heart, Minus, Plus, SaudiRiyal, ShoppingBag, Star } from "lucide-react";
+import {  CircleCheck, CircleX, Eye, Heart, Minus, Plus, SaudiRiyal, ShoppingBag, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocale, useTranslations } from "next-intl";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { useCart, useWishlist } from "@/store/cart-store"; // 🟢 استدعاء الستيت
+import { useCart, useWishlist } from "@/store/cart-store"; 
 import {
   Dialog,
   DialogContent,
@@ -22,11 +22,10 @@ interface ProductCardProps {
   id: string;
   stableId: string;
   image: string;
-  titleAr: string;
-  titleEn: string;
+  nameAr: string;
+  nameEn: string;
   price: number;
   oldprice: number;
-  modelnumber: string | number | null;
   stock: number;
   onSubscribe?: () => void;
   category?: string;   
@@ -37,16 +36,15 @@ export default function ProductCard({
   id,
   stableId,
   image,
-  titleAr,
-  titleEn,
+  nameAr,
+  nameEn,
   price,
   oldprice,
-  modelnumber,
   stock,
 
 }: ProductCardProps) {
   const locale = useLocale();
-  const title = locale === "ar" ? titleAr : titleEn;
+  const title = locale === "ar" ? nameAr : nameEn;
   const t = useTranslations("card");
 
   const { isSignedIn } = useAuth(); 
@@ -81,9 +79,9 @@ export default function ProductCard({
   return (
     <div className="flex flex-col items-center">
       {/* الصورة */}
-      <div className="relative h-[250px] w-[220px] overflow-visible group">
+      <div className="relative h-62.5 w-55 overflow-visible group">
         <Link href={`/${slugify(title)}/${stableId}`}>
-          <div className="relative h-[250px] w-[220px] overflow-hidden group  transition">
+          <div className="relative h-62.5 w-55 overflow-hidden group  transition">
             <Image
               src={image}
               alt={title}
@@ -120,7 +118,6 @@ export default function ProductCard({
                 title={title}
                 price={price}
                 oldprice={oldprice}
-                modelnumber={modelnumber}
                 stock={stock}
                 addItem={addItem}
 
@@ -135,7 +132,7 @@ export default function ProductCard({
 
       {/* الاسم */}
 
-      <h2 className="font-bold text-sm text-center mt-4 w-full line-clamp-1 min-h-[20px]">
+      <h2 className="font-bold text-sm text-center mt-4 w-full line-clamp-1 min-h-5">
         {title}
       </h2>
       {/* السعر */}
@@ -153,7 +150,7 @@ export default function ProductCard({
       </div>
       {/* زر الاشتراك */}
       <Button
-        className="w-full max-w-[220px] mt-4 font-bold text-sm rounded-none cursor-pointer bg-gray-300 hover:bg-gray-300 text-green-900"
+        className="w-full max-w-55 mt-4 font-bold text-sm rounded-none cursor-pointer bg-gray-300 hover:bg-gray-300 text-green-900"
         disabled={stock === 0}
         onClick={() => {
           if (stock > 0) {
@@ -181,7 +178,6 @@ interface DialogDemoProps {
   title: string;
   price: number;
   oldprice: number;
-  modelnumber: string | number | null;
   stock: number;
   addItem: (item: CartItem) => void; 
 
@@ -191,7 +187,7 @@ interface DialogDemoProps {
 
 
 
-export function DialogDemo({ id, image, title, price, oldprice, modelnumber, stock, addItem }: DialogDemoProps) {
+export function DialogDemo({ id, image, title, price, oldprice,  stock, addItem }: DialogDemoProps) {
   const [dialogQty, setDialogQty] = useState(1);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -233,7 +229,7 @@ export function DialogDemo({ id, image, title, price, oldprice, modelnumber, sto
         </TooltipContent>
       </Tooltip>
 
-      <DialogContent className="sm:max-w-[900px] h-[500px] rounded-none pr-0">
+      <DialogContent className="sm:max-w-225 h-125 rounded-none pr-0">
 
         <div className="flex    items-center">
           <div className="relative w-1/2 h-full ">
@@ -281,14 +277,7 @@ export function DialogDemo({ id, image, title, price, oldprice, modelnumber, sto
               <Star className="text-amber-300 w-5 fill-amber-300" />
               <Star className="text-amber-300 w-5 fill-amber-300" />
             </div>
-            <div className="border flex justify-between rounded-sm p-2 cursor-auto">
-              <div className="flex gap-4   items-center">
-                <Barcode className="w-4 h-4 " />
-                <h3 className="font-normal text-base text-black">{t("modelNumber")}</h3>
-              </div>
-              <div>{modelnumber}</div>
-
-            </div>
+           
 
             {stock > 0 && (
               <div className="flex items-center rounded-sm border">
@@ -310,7 +299,7 @@ export function DialogDemo({ id, image, title, price, oldprice, modelnumber, sto
             <div className="flex gap-3 items-center w-full">
               <Button
                 className={`font-bold text-sm rounded-none cursor-pointer ${stock > 0
-                  ? "flex-1 max-w-[220px] bg-gray-300 hover:bg-gray-300 hover:border-transparent transition-all duration-300 border border-black text-green-900"
+                  ? "flex-1 max-w-55 bg-gray-300 hover:bg-gray-300 hover:border-transparent transition-all duration-300 border border-black text-green-900"
                   : "w-full text-green-900"
                   }`}
                 disabled={stock === 0}
@@ -328,7 +317,7 @@ export function DialogDemo({ id, image, title, price, oldprice, modelnumber, sto
               </Button>
 
               {stock > 0 && (
-                <div className="flex items-center rounded-sm border flex-shrink-0">
+                <div className="flex items-center rounded-sm border shrink-0">
                   <span
                     className="px-3 py-2 cursor-pointer hover:bg-gray-100"
                     onClick={handleInc}

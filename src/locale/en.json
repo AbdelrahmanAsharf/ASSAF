@@ -189,7 +189,8 @@
     "total": "Total",
     "cardInfo": "Card Information",
     "payNow": "Pay Now",
-    "securePayment": "Payment is secure and encrypted"
+    "securePayment": "Payment is secure and encrypted",
+    "paymentFailed": "Payment failed, please try again"
   },
   "success": {
     "title": "Payment Successful!",

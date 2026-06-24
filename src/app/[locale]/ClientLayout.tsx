@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import { Bounce, ToastContainer } from "react-toastify";
 import ScrollCircle from "@/components/ScrollCircle/ScrollCircle";
 import { NextIntlClientProvider, type AbstractIntlMessages } from "next-intl";
+import { NavItem } from "@/types/nav";
 
 type Dir = "rtl" | "ltr";
 
@@ -17,12 +18,14 @@ export default function ClientLayout({
   dir,
   fontClass,
   messages,
+  navs,
 }: {
   children: ReactNode;
   locale: string;
   dir: Dir;
   fontClass: string;
   messages: AbstractIntlMessages;
+   navs: NavItem[];
 }) {
   const pathname = usePathname();
   const isCheckout = pathname?.includes("/checkout");
@@ -44,7 +47,7 @@ export default function ClientLayout({
                 theme="colored"
                 transition={Bounce}
               />
-              <Header dir={dir} locale={locale} />
+              <Header dir={dir} locale={locale} navs={navs } />
               <main>{children}</main>
               <ScrollCircle dir={dir} />
               <Footer />

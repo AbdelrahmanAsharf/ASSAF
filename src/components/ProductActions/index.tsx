@@ -3,10 +3,9 @@
 
 import { useCart } from "@/store/cart-store";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Plus, Minus, SaudiRiyal, Barcode } from "lucide-react";
+import { ShoppingCart, Plus, Minus, SaudiRiyal } from "lucide-react";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-
 import { useToast } from "@/utils/toast";
 
 interface ProductActionsProps {
@@ -16,7 +15,6 @@ interface ProductActionsProps {
   stock: number;
   title: string;
   image: string;
-  modelnumber: string;
 }
 
 export default function ProductActions({
@@ -26,7 +24,6 @@ export default function ProductActions({
   stock,
   title,
   image,
-  modelnumber,
 }: ProductActionsProps) {
   const [dialogQty, setDialogQty] = useState(1);
 
@@ -45,14 +42,7 @@ const t = useTranslations("ProductActions");
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between w-full">
-        <div className="flex items-center gap-1">
-          <Barcode className="w-4 h-4 " />
-          <p>{t("modelNumber")}</p>
-        </div>
-        <span className="text-gray-600">{modelnumber}</span>
-
-      </div>
+      
       {/* العداد والسعر */}
       <div className="flex justify-between items-center w-full">
         <p>{t("price")}</p>
@@ -83,7 +73,7 @@ const t = useTranslations("ProductActions");
           >
             <Plus />
           </span>
-          <span className="border-y px-4 py-2 cursor-auto min-w-[50px] text-center">
+          <span className="border-y px-4 py-2 cursor-auto min-w-12.5 text-center">
             {dialogQty}
           </span>
           <span

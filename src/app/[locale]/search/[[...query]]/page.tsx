@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { searchEverything } from "@/lib/search";
 import ProductCard from "@/components/ProductCard/ProductCard";
 import { ShoppingBag } from "lucide-react";
+export const dynamic = "force-dynamic"; // ✅ ضيف ده
 
 interface Props {
   params: Promise<{
@@ -12,7 +13,7 @@ interface Props {
 }
 
 export default async function SearchPage({ params }: Props) {
-  const { locale, query: rawQuery } = await params;
+  const {  query: rawQuery } = await params;
 
 
   if (!rawQuery || rawQuery.length === 0) {
@@ -26,7 +27,7 @@ export default async function SearchPage({ params }: Props) {
     notFound();
   }
 
-  const results = await searchEverything(query, locale);
+  const results = await searchEverything(query);
 
   return (
     <div className="pt-35 mt-10 container">
@@ -57,11 +58,10 @@ export default async function SearchPage({ params }: Props) {
                     id={product.id}
                     stableId={product.stableId ?? product.id}
                     image={product.imageUrl}
-                    titleAr={product.titleAr}
-                    titleEn={product.titleEn}
+                    nameAr={product.nameAr}
+                    nameEn={product.nameEn}
                     price={product.price}
                     oldprice={product.oldPrice}
-                    modelnumber={product.modelNumber || null}
                     stock={product.stock}
                   />
                 ))}
