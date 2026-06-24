@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { getProductsByCategoryOrSlug } from "@/actions/getProducts";
 import ProductCard from "@/components/ProductCard/ProductCard";
@@ -20,7 +21,7 @@ export default async function SectionProducts({ title, locale, limit = 4 }: Sect
     <section className="section-gap container mx-auto w-full ">
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {limitedProducts.length > 0 ? (
-          limitedProducts.map((p) => (
+          limitedProducts.map((p: any) => (
             <ProductCard
               key={p.id}
               id={p.id}

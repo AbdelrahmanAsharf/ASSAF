@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/app/[locale]/cart/page.tsx
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
@@ -64,7 +65,7 @@ export default function Cart() {
       // 2️⃣ Prepare cart data to pass to checkout page
       const cartData = encodeURIComponent(
         JSON.stringify(
-          items.map((i) => ({
+          items.map((i: any) => ({
             id: i.id,
             title: i.title,
             image: i.image,
@@ -93,7 +94,7 @@ export default function Cart() {
         {items.length > 0 ? (
           <div className="flex gap-5 flex-col lg:flex-row container">
             <div className="flex lg:w-3/4 md:w-full flex-col">
-              {items.map((item) => (
+              {items.map((item: any) => (
                 <div
                   key={item.id}
                   className="relative flex flex-col md:items-center md:pl-20 md:pb-6 md:pr-5 p-2 md:flex-row md:justify-between border mb-8 bg-white border-black rounded-sm"

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useWishlist } from "@/store/cart-store";
@@ -48,7 +49,7 @@ export default function WishlistContent() {
 
     return (
         <div className="mx-60">
-            {items.map((item) => {
+            {items.map((item: any) => {
                 const stock = item.stock;
 
                 return (

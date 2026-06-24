@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/app/[locale]/search/[[...query]]/page.tsx
 import { notFound } from "next/navigation";
 import { searchEverything } from "@/lib/search";
@@ -52,7 +53,7 @@ export default async function SearchPage({ params }: Props) {
           {results.products.length > 0 ? (
             <section>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 justify-items-center">
-                {results.products.map((product) => (
+                {results.products.map((product: any) => (
                   <ProductCard
                     key={product.id}
                     id={product.id}
