@@ -55,7 +55,7 @@ export default function WishlistContent() {
                 return (
                     <div key={item.id} className="flex justify-between items-center">
                         <div className="flex items-center gap-4">
-                            <div className="relative h-[100px] w-[100px] overflow-hidden rounded">
+                            <div className="relative h-25 w-25 overflow-hidden rounded">
                                 <Link href={`/${slugify(item.title)}/${item.id}`}>
                                     <Image
                                         src={item.image}
@@ -85,7 +85,7 @@ export default function WishlistContent() {
 
                         <div className="flex items-center gap-2">
                             <Button
-                                className="w-full font-bold text-sm rounded-sm pt-5 pb-6 px-9 cursor-pointer border-black border-1 bg-gray-300 hover:border-gray-300 hover:bg-gray-300 text-green-950"
+                                className="w-full font-bold text-sm rounded-sm pt-5 pb-6 px-9 cursor-pointer border-black border bg-gray-300 hover:border-gray-300 hover:bg-gray-300 text-green-950"
                                 disabled={stock === 0}
                                 onClick={() => handleAddToCart(item)}
                             >
