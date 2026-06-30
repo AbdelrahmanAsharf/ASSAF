@@ -24,7 +24,7 @@ export default function Tobacco({ params }: { params: { locale: string } }) {
                 <div className="menu text-center pt-15">
                     <h1 className="font-semibold text-4xl">{t("Tobacco")}</h1>
                 </div>
-                <SectionProducts title={locale === "ar" ? "توباكو" : "توباكو"} locale={locale} limit={3} />
+                <SectionProducts title={locale === "ar" ? "توباكو" : "Tobacco"} locale={locale} limit={3} />
             </div>
 
         </section>

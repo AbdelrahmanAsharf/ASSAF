@@ -12,7 +12,7 @@ export default function Lady({ params }: { params: { locale: string } }) {
       <div className="menu text-center">
         <h1 className="font-semibold text-4xl">{t("bundleOffers")}</h1>
       </div>
-      <SectionProducts title={locale === "ar" ? "المجموعات-عروض-اليوم" : "المجموعات-عروض-اليوم"} locale={locale} limit={1} />
+      <SectionProducts title={locale === "ar" ? "مجموعةاروقيت" : "Arrogate Collection"} locale={locale} limit={3} />
     </section>
   );
 }

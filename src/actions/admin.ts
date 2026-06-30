@@ -42,7 +42,7 @@ export async function addSubSubCategory(formData: FormData) {
   const subCategoryId = formData.get("subCategoryId") as string;
   if (!nameAr || !nameEn || !subCategoryId) throw new Error("البيانات ناقصة");
   await db.subSubCategory.create({
-    data: { nameAr, nameEn, subCategoryId, stableId: stableId(nameAr, "s") },
+    data: { nameAr, nameEn, subCategoryId, stableId: stableId(nameAr, "ss") },
   });
 }
 

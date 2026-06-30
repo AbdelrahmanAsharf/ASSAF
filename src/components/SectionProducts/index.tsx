@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { getProductsByCategoryOrSlug } from "@/actions/getProducts";
+import { getProductsByCategoryOrSlug } from "@/actions/products";
 import ProductCard from "@/components/ProductCard/ProductCard";
 import { Handbag } from "lucide-react";
 

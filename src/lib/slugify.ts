@@ -13,7 +13,7 @@ export function slugify(str: string) {
     .toLowerCase();
 }
 
-export function stableId(str: string, prefix: "c" | "p" | "s") {
+export function stableId(str: string, prefix: "c" | "p" | "s" | "ss") {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     hash = (hash << 5) - hash + str.charCodeAt(i);

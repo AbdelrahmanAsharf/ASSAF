@@ -16,7 +16,6 @@ import ProductCard from "@/components/ProductCard/ProductCard";
 import { CircleCheck, CircleX, SaudiRiyal, Star } from "lucide-react";
 import Image from "next/image";
 import ProductActions from "@/components/ProductActions";
-import { getProductsByCategoryOrSlug } from "@/actions/getProducts";
 import { getTranslations } from "next-intl/server";
 import { Handbag } from "lucide-react";
 import {
@@ -33,57 +32,12 @@ interface PageProps {
 }
 
 export default async function Page({ params }: PageProps) {
-  const { locale, slug, id } = await params;
+  const { locale, id } = await params;
 
   const t = await getTranslations("ProductPage");
   const dir = locale === "ar" ? "rtl" : "ltr";
-  const type = id[0];
+  const type = id.startsWith("ss") ? "ss" : id[0];
   const realStableId = id;
-
-  const decodedSlug = decodeURIComponent(slug);
-  const cleanSlug = decodedSlug.replace(/-/g, " ").trim();
-
-  const isSpecialPage =
-    cleanSlug === "الجديد" ||
-    cleanSlug === "new" ||
-    cleanSlug === "جميع المنتجات" ||
-    cleanSlug === "all products";
-
-  if (isSpecialPage) {
-    const specialProducts = await getProductsByCategoryOrSlug(slug);
-
-    if (specialProducts.length === 0) return notFound();
-
-    const pageTitle =
-      cleanSlug.includes("جديد") || cleanSlug === "new"
-        ? t("newArrivals")
-        : t("allProducts");
-
-    const crumbs = [{ title: pageTitle }];
-    return (
-      <div className="pt-20 lg:pt-35 mt-10">
-        <Breadcrumbs crumbs={crumbs} />
-        <div className="container">
-          <h2 className="font-extrabold text-2xl mb-6">{pageTitle}</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 my-6">
-            {specialProducts.map((p: any) => (
-              <ProductCard
-                key={p.id}
-                stableId={p.stableId}
-                id={p.id}
-                image={p.imageUrl}
-                nameAr={p.nameAr}
-                nameEn={p.nameEn}
-                price={p.price}
-                oldprice={p.oldPrice}
-                stock={p.stock}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   if (type === "c") {
     const category = await db.category.findUnique({
@@ -256,6 +210,71 @@ export default async function Page({ params }: PageProps) {
     );
   }
 
+  // وضيف بعد if (type === "s"):
+  if (type === "ss") {
+    const subSubCategory = await db.subSubCategory.findUnique({
+      where: { stableId: realStableId },
+      include: { products: true, subCategory: { include: { category: true } } },
+    });
+
+    if (!subSubCategory) return notFound();
+
+    const products = subSubCategory.products;
+    const subName =
+      locale === "ar"
+        ? subSubCategory.subCategory.nameAr
+        : subSubCategory.subCategory.nameEn;
+    const subSubName =
+      locale === "ar" ? subSubCategory.nameAr : subSubCategory.nameEn;
+    const catName =
+      locale === "ar"
+        ? subSubCategory.subCategory.category.nameAr
+        : subSubCategory.subCategory.category.nameEn;
+
+    const crumbs = [
+      {
+        title: catName,
+        href: `/${slugify(catName)}/${subSubCategory.subCategory.category.stableId}`,
+      },
+      {
+        title: subName,
+        href: `/${slugify(subName)}/${subSubCategory.subCategory.stableId}`,
+      },
+      { title: subSubName },
+    ];
+
+    return (
+      <div className="pt-20 lg:pt-35 mt-10">
+        <Breadcrumbs crumbs={crumbs} />
+        <h2 className="font-extrabold text-2xl mb-6 container">{subSubName}</h2>
+        {products.length > 0 ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 my-6">
+            {products.map((p: any) => (
+              <ProductCard
+                key={p.id}
+                stableId={p.stableId}
+                id={p.id}
+                image={p.imageUrl}
+                nameAr={p.nameAr}
+                nameEn={p.nameEn}
+                price={p.price}
+                oldprice={p.oldPrice}
+                stock={p.stock}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-5 py-25">
+            <p className="text-sm font-medium text-gray-400">
+              {locale === "ar"
+                ? "لا توجد منتجات في هذا القسم"
+                : "No products in this category"}
+            </p>
+          </div>
+        )}
+      </div>
+    );
+  }
   if (type === "p") {
     const product = await db.product.findUnique({
       where: { stableId: realStableId },

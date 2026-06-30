@@ -1,4 +1,4 @@
-// actions/getProducts.ts
+// src/actions/products.ts
 "use server";
 
 import { db } from "@/lib/prisma";
@@ -26,23 +26,30 @@ export async function getProductsBySubCategory(subCategoryId: string) {
   });
 }
 
-export async function getProductsByCategoryOrSlug(slug: string) {
-  const decoded = decodeURIComponent(slug).replace(/-/g, " ").trim();
-  const isNew = decoded === "الجديد" || decoded === "new";
-
-  if (isNew) {
-    return await db.product.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 20,
-    });
-  }
-
+export async function getProductsBySubSubCategory(subSubCategoryId: string) {
   return await db.product.findMany({
-    where: {
-      OR: [
-        { nameAr: { contains: decoded } },
-        { nameEn: { contains: decoded } },
-      ],
-    },
+    where: { subSubCategoryId },
   });
+}
+
+export async function getProductsByCategoryOrSlug(slug: string) {
+  const cleanSlug = decodeURIComponent(slug).replace(/-/g, " ").trim();
+
+  
+
+
+
+  const category = await db.category.findFirst({
+    where: { OR: [{ nameAr: cleanSlug }, { nameEn: cleanSlug }] },
+    include: { products: true },
+  });
+  if (category?.products?.length) return category.products;
+
+  const subCategory = await db.subCategory.findFirst({
+    where: { OR: [{ nameAr: cleanSlug }, { nameEn: cleanSlug }] },
+    include: { products: true },
+  });
+  if (subCategory?.products?.length) return subCategory.products;
+
+  return [];
 }

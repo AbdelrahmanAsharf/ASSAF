@@ -38,13 +38,13 @@ export default function Section1() {
       titleAr: "مجموعة فرانكل - 800 مل",
       titleEn: "مجموعة فرانكل - 800 مل",
       image: "/img/Section1/مجموعه فرانكل.webp",
-      stableId: "p1192758564",
+      stableId: "p303971178",
     },
     {
       titleAr: "مجموعة بيقاسوس مع قريس ايرك 200 مل",
       titleEn: "PEGASUS COLLECTION + GRIS ERIK",
       image: "/img/Section1/مجموعه بيقاسوس.webp",
-      stableId: "p1642335437",
+      stableId: "p783333950",
     },
   ];
 

@@ -42,13 +42,12 @@ export default function Cart() {
     setLoading(true);
 
     try {
-      // 1️⃣ Call our backend to generate the Kashier hash
       const res = await fetch("/api/kashier/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: totalAmount,
-          currency: "EGP",  // ← غيّر للعملة اللي تناسبك (SAR, EGP, USD...)
+          currency: "EGP",  
           cartItems: items.map((i) => ({
             id: i.id,
             title: i.title,
@@ -62,7 +61,6 @@ export default function Cart() {
 
       const { orderId, amount, currency, hash, merchantId, apiKey } = await res.json();
 
-      // 2️⃣ Prepare cart data to pass to checkout page
       const cartData = encodeURIComponent(
         JSON.stringify(
           items.map((i: any) => ({
@@ -76,7 +74,6 @@ export default function Cart() {
         )
       );
 
-      // 3️⃣ Navigate to checkout page with all Kashier params
       router.push(
         `/checkout?orderId=${orderId}&amount=${amount}&currency=${currency}&hash=${hash}&merchantId=${merchantId}&apiKey=${apiKey}&cart=${cartData}`
       );

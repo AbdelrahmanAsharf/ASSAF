@@ -24,7 +24,7 @@ export default function Frankl({ params }: { params: { locale: string } }) {
                 <div className="menu text-center pt-15">
                     <h1 className="font-semibold text-4xl">{t("Frankl")}</h1>
                 </div>
-                <SectionProducts title={locale === "ar" ? "مجموعة فرانكل" : "Frankel Group"} locale={locale} limit={3} />
+                <SectionProducts title={locale === "ar" ? " مجموعة فرانكل" : "Frankel Collection"} locale={locale} limit={3} />
             </div>
 
         </section>

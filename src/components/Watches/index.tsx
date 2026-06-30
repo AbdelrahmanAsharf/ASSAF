@@ -24,7 +24,7 @@ export default function Watches({ params }: { params: { locale: string } }) {
                 <div className="menu text-center pt-15">
                     <h1 className="font-semibold text-4xl">{t("Watches")}</h1>
                 </div>
-                <SectionProducts title={locale === "ar" ? "ساعات عساف" : "Assaf Watches"} locale={locale} limit={3} />
+                <SectionProducts title={locale === "ar" ? "ساعات" : "Assaf watches"} locale={locale} limit={3} />
             </div>
 
         </section>

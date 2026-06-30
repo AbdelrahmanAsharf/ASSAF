@@ -23,14 +23,9 @@ export default function Profileindex() {
         });
     }, []);
     return (
-        <div className="lg:py-5">
-            <div className="bg-gray-700 flex py-20 items-center justify-center relative">
-                <Image
-                    src="/b7mx5Vp0dkXgh7M718NYszs9hmwKILfSRIemk0Fl.png"
-                    alt="example image"
-                    width={200}
-                    height={200}
-                />
+        <div className="lg:py-5 h-fit">
+            <div className="bg-gray-700 min-h-25 md:min-h-50 lg:min-h-75 flex py-20 items-center justify-center relative">
+               
             </div>
             <div className='border-b border-gray-300'>
                 <div className="container lg:px-60">
