@@ -118,7 +118,9 @@
   * {
     @apply border-border outline-ring/50;
   }
-
+html {
+    scrollbar-gutter: stable;
+  }
   body {
     font-family:
       "Tajawal",
@@ -128,7 +130,15 @@
       "Segoe UI",
       Roboto,
       sans-serif;
+    overflow-x: hidden;
+
     @apply bg-background text-foreground;
+  }
+  body[data-scroll-locked] {
+    margin-right: 0 !important;
+    padding-right: 0 !important;
+    overflow: hidden !important;
+    position: static !important;
   }
 
   .font-tajawal {
@@ -196,75 +206,6 @@
     transform: translateX(-13) !important;
   }
 
-  /* RTL Phone Input Fix */
-  .phone-input-rtl .react-tel-input {
-    direction: ltr;
-  }
-
-  .phone-input-rtl .react-tel-input .form-control {
-    text-align: right;
-    padding-right: 52px;
-    padding-left: 12px;
-    direction: ltr;
-    unicode-bidi: plaintext;
-  }
-
-  .phone-input-rtl .react-tel-input .flag-dropdown {
-    right: 0;
-    left: auto;
-    border-radius: 0 8px 8px 0;
-    border-right: 1px solid #cacaca;
-    border-left: none;
-  }
-
-  .phone-input-rtl .react-tel-input .selected-flag {
-    padding: 0 8px 0 0;
-  }
-
-  /* ✅ ده اللي ناقص — الـ dropdown نفسه */
-  .phone-input-rtl .react-tel-input .country-list {
-    right: 0;
-    left: auto;
-    text-align: right;
-    direction: rtl;
-  }
-
-  .phone-input-rtl .react-tel-input .country-list .country {
-    display: flex;
-    flex-direction: row-reverse; /* ✅ flag يمين، اسم يسار */
-    justify-content: flex-start;
-    gap: 8px;
-    padding: 8px 12px;
-  }
-
-  .phone-input-rtl .react-tel-input .country-list .country .dial-code {
-    margin-right: auto; /* ✅ الكود يروح أقصى يسار */
-    margin-left: 0;
-  }
-
-  .phone-input-rtl .react-tel-input .country-list .search {
-    direction: rtl;
-    text-align: right;
-    display: flex; /* ✅ خلي العدسة والـ input جنب بعض */
-    flex-direction: row;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 12px;
-  }
-
-  .phone-input-rtl .react-tel-input .country-list .search-emoji {
-    order: 1; /* ✅ العدسة على اليمين */
-    font-size: 14px;
-    flex-shrink: 0;
-  }
-
-  .phone-input-rtl .react-tel-input .country-list .search-box {
-    order: 0; /* ✅ الـ input على الشمال */
-    direction: ltr; /* ✅ الكتابة فيه LTR عشان search يشتغل صح */
-    text-align: right;
-    width: 100%;
-    flex: 1;
-  }
   .toast-responsive {
     @apply w-full max-w-xs mx-auto text-sm font-medium;
   }
